@@ -71,11 +71,15 @@ export async function createMemberAccount(
     body: payload,
   });
 
-  if (fnResult.error || fnResult.data?.error) {
-    const errText = fnResult.data?.error || fnResult.error?.message;
-    throw new Error(
-      errText ||
-        'Edge Function create-member belum terpasang di Supabase. Anda dapat menambahkan user via Supabase Dashboard -> Authentication.'
-    );
+  if (fnResult.error) {
+    if (fnResult.error.message.includes('Failed to send a request')) {
+      throw new Error(
+        'Tidak dapat menghubungi Supabase Edge Function create-member. Pastikan fungsi sudah di-deploy ke project Supabase yang sama dengan aplikasi.'
+      );
+    }
+    throw new Error(fnResult.error.message);
+  }
+  if (fnResult.data?.error) {
+    throw new Error(fnResult.data.error);
   }
 }
