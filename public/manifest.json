@@ -1,0 +1,25 @@
+{
+  "name": "TEMAN — Team Management",
+  "short_name": "TEMAN",
+  "description": "Workspace kolaboratif untuk mengelola kompetisi, tim, tugas, kalender, dan progres kerja dalam satu tempat.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#020617",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "/logo-app.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

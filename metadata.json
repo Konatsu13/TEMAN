@@ -1,0 +1,6 @@
+{
+  "name": "TEMAN — Team Management",
+  "description": "Workspace kolaboratif untuk mengelola kompetisi, tim, tugas, kalender, dan progres kerja dalam satu tempat.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
