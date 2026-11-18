@@ -1,5 +1,5 @@
 // Service Worker for TEMAN (Team Management) PWA
-const CACHE_NAME = 'teman-cache-v1';
+const CACHE_NAME = 'teman-cache-v2';
 const STATIC_ASSETS = [
   '/',
   '/index.html',

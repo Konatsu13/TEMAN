@@ -35,10 +35,15 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const root = document.documentElement;
+    const themeColor = document.querySelector<HTMLMetaElement>(
+      'meta[name="theme-color"]'
+    );
     if (theme === 'dark') {
       root.classList.add('dark');
+      if (themeColor) themeColor.content = '#0F172A';
     } else {
       root.classList.remove('dark');
+      if (themeColor) themeColor.content = '#F8FAFC';
     }
     try {
       localStorage.setItem(THEME_STORAGE_KEY, theme);
