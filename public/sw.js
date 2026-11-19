@@ -1,5 +1,5 @@
 // Service Worker for TEMAN (Team Management) PWA
-const CACHE_NAME = 'teman-cache-v3';
+const CACHE_NAME = 'teman-cache-v4';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -7,7 +7,9 @@ const STATIC_ASSETS = [
   '/favicon.png',
   '/favicon.ico',
   '/logo-app.png',
-  '/logo.png'
+  '/logo.png',
+  '/pwa-icon-192.png',
+  '/pwa-icon-512.png'
 ];
 
 self.addEventListener('install', (event) => {

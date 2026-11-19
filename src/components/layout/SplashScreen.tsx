@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { BrandLogo } from '../shared/BrandLogo';
 
 interface SplashScreenProps {
   onComplete: () => void;
@@ -33,7 +32,11 @@ export function SplashScreen({ onComplete, durationMs = 800 }: SplashScreenProps
       }`}
     >
       <div className="animate-teman-splash relative flex flex-col items-center gap-4 px-6 text-center">
-        <BrandLogo size="md" showWordmark={false} />
+        <img
+          src="/logo-app.png"
+          alt="Logo TEMAN"
+          className="h-12 w-12 object-contain"
+        />
         <div>
           <h1 className="font-display text-2xl font-bold tracking-tight text-slate-900">
             TEMAN
