@@ -1,5 +1,5 @@
 import { requireSupabaseClient } from '../lib/supabase';
-import type { AppRole, Tables } from '../types/database.types';
+import type { AppRole } from '../types/database.types';
 
 export interface MemberListItem {
   id: string;
@@ -52,6 +52,61 @@ export async function toggleMemberActive(
   }
 }
 
+/**
+ * Supabase functions.invoke only exposes a generic message for non-2xx
+ * responses. The raw Response is available on `error.context`, so read the
+ * function's `{ error }` payload to surface something actionable.
+ */
+async function readFunctionError(error: unknown): Promise<string> {
+  const fallback =
+    error instanceof Error && error.message.trim()
+      ? error.message
+      : 'Terjadi kesalahan yang tidak diketahui.';
+  const context = (error as { context?: unknown } | null)?.context;
+
+  if (typeof Response !== 'undefined' && context instanceof Response) {
+    try {
+      const payload = (await context.clone().json()) as {
+        error?: unknown;
+        message?: unknown;
+      };
+      const message =
+        typeof payload?.error === 'string'
+          ? payload.error
+          : typeof payload?.message === 'string'
+            ? payload.message
+            : '';
+      if (message.trim()) return message.trim();
+    } catch {
+      // Body is not JSON; keep the fallback.
+    }
+  }
+
+  if (/failed to send a request|failed to fetch|networkerror/i.test(fallback)) {
+    return 'Tidak dapat menghubungi server. Periksa koneksi lalu coba lagi.';
+  }
+  return fallback;
+}
+
+async function invokeMemberFunction(
+  name: string,
+  body: Record<string, unknown>
+): Promise<Record<string, unknown>> {
+  const client = requireSupabaseClient();
+  const { data, error } = await client.functions.invoke<Record<string, unknown>>(
+    name,
+    { body }
+  );
+
+  if (error) {
+    throw new Error(await readFunctionError(error));
+  }
+  if (data && typeof data.error === 'string') {
+    throw new Error(data.error);
+  }
+  return data ?? {};
+}
+
 export interface CreateMemberPayload {
   username: string;
   full_name: string;
@@ -61,25 +116,31 @@ export interface CreateMemberPayload {
 export async function createMemberAccount(
   payload: CreateMemberPayload
 ): Promise<void> {
-  const client = requireSupabaseClient();
+  await invokeMemberFunction('create-member', { ...payload });
+}
 
-  // Try calling Supabase Edge Function 'create-member'
-  const fnResult = await client.functions.invoke<{
-    success?: boolean;
-    error?: string;
-  }>('create-member', {
-    body: payload,
+export interface UpdateMemberPayload {
+  userId: string;
+  full_name: string;
+  username: string;
+  password?: string;
+}
+
+export async function updateMemberAccount(
+  payload: UpdateMemberPayload
+): Promise<void> {
+  await invokeMemberFunction('manage-member', {
+    action: 'update',
+    user_id: payload.userId,
+    full_name: payload.full_name,
+    username: payload.username,
+    ...(payload.password ? { password: payload.password } : {}),
   });
+}
 
-  if (fnResult.error) {
-    if (fnResult.error.message.includes('Failed to send a request')) {
-      throw new Error(
-        'Tidak dapat menghubungi Supabase Edge Function create-member. Pastikan fungsi sudah di-deploy ke project Supabase yang sama dengan aplikasi.'
-      );
-    }
-    throw new Error(fnResult.error.message);
-  }
-  if (fnResult.data?.error) {
-    throw new Error(fnResult.data.error);
-  }
+export async function deleteMemberAccount(userId: string): Promise<void> {
+  await invokeMemberFunction('manage-member', {
+    action: 'delete',
+    user_id: userId,
+  });
 }

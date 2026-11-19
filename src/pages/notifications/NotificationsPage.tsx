@@ -291,7 +291,7 @@ export function NotificationsPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
           <Button
             type="button"
             variant="ghost"
@@ -299,9 +299,15 @@ export function NotificationsPage() {
             onClick={() => void refresh()}
             disabled={loading}
             aria-label="Segarkan notifikasi"
+            leftIcon={
+              <RefreshCw
+                className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`}
+                aria-hidden="true"
+              />
+            }
+            className="shrink-0"
           >
-            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-            <span className="hidden sm:inline">Segarkan</span>
+            Segarkan
           </Button>
 
           {unreadCount > 0 && (
@@ -310,9 +316,10 @@ export function NotificationsPage() {
               variant="secondary"
               size="sm"
               onClick={() => void markAllAsRead()}
+              leftIcon={<CheckCheck className="h-4 w-4 shrink-0" aria-hidden="true" />}
+              className="min-w-0 flex-1 justify-center sm:flex-none"
             >
-              <CheckCheck className="h-4 w-4" />
-              <span>Tandai Semua Dibaca</span>
+              Tandai Semua Dibaca
             </Button>
           )}
         </div>
@@ -322,7 +329,7 @@ export function NotificationsPage() {
       <Card variant="default" className="overflow-hidden border-blue-200/60 bg-blue-50/30 dark:border-blue-900/40 dark:bg-blue-950/20">
         <CardContent className="p-4 sm:p-5">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-start gap-3">
+            <div className="flex min-w-0 flex-1 items-start gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white shadow-xs">
                 {pushSubscribed ? (
                   <BellRing className="h-5 w-5" />
@@ -359,7 +366,7 @@ export function NotificationsPage() {
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2 shrink-0">
+            <div className="grid w-full shrink-0 grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-nowrap sm:items-center">
               {pushSupported && (
                 <>
                   <Button
@@ -368,18 +375,25 @@ export function NotificationsPage() {
                     variant={pushSubscribed ? 'outline' : 'primary'}
                     onClick={handleTogglePush}
                     disabled={pushLoading}
+                    className="w-full justify-center px-2 sm:w-auto sm:px-2.5"
                   >
-                    {pushSubscribed ? 'Nonaktifkan Push' : 'Aktifkan Web Push'}
+                    <span className="sm:hidden">
+                      {pushSubscribed ? 'Matikan Push' : 'Aktifkan Push'}
+                    </span>
+                    <span className="hidden sm:inline">
+                      {pushSubscribed ? 'Nonaktifkan Push' : 'Aktifkan Web Push'}
+                    </span>
                   </Button>
                   <Button
                     type="button"
                     size="sm"
-                    variant="ghost"
+                    variant="secondary"
                     onClick={handleTestNotification}
                     disabled={pushLoading}
+                    leftIcon={<Send className="h-3.5 w-3.5" aria-hidden="true" />}
+                    className="w-full justify-center sm:w-auto"
                   >
-                    <Send className="h-3.5 w-3.5" />
-                    <span>Uji Coba</span>
+                    Uji Coba
                   </Button>
                 </>
               )}
@@ -390,9 +404,10 @@ export function NotificationsPage() {
                   size="sm"
                   variant="secondary"
                   onClick={handleInstallApp}
+                  leftIcon={<Download className="h-3.5 w-3.5" aria-hidden="true" />}
+                  className="col-span-2 w-full justify-center sm:col-auto sm:w-auto"
                 >
-                  <Download className="h-3.5 w-3.5" />
-                  <span>Pasang Aplikasi (PWA)</span>
+                  Pasang Aplikasi (PWA)
                 </Button>
               )}
 

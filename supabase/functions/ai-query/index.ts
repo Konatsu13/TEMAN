@@ -14,6 +14,8 @@ const INTENTS = [
   'competition_progress',
   'tasks_by_member',
   'total_registration_cost',
+  'greeting',
+  'help',
   'unclear',
 ] as const;
 
@@ -114,7 +116,10 @@ function parseClassification(value: unknown): Classification {
 
   return {
     intent: candidate.intent as Intent,
-    status: typeof candidate.status === 'string' ? candidate.status : '',
+    status:
+      typeof candidate.status === 'string' && candidate.status !== 'none'
+        ? candidate.status
+        : '',
     deadline_scope: scope,
   };
 }
@@ -141,8 +146,10 @@ nearest_deadline (deadline kompetisi atau tugas paling dekat)
 competition_progress (progres tiap kompetisi dari tugas done / semua tugas)
 tasks_by_member (jumlah tugas per anggota)
 total_registration_cost (total biaya pendaftaran)
+greeting (sapaan seperti halo, hai, pagi, atau terima kasih)
+help (pengguna menanyakan apa saja yang bisa asisten lakukan)
 unclear (tidak didukung atau ambigu)
-Status harus salah satu status kompetisi/tugas di atas, atau string kosong.
+Status harus salah satu status kompetisi/tugas di atas, atau "none" bila pertanyaan tidak memfilter status.
 deadline_scope harus competition, task, atau any.
 Pertanyaan pengguna: ${JSON.stringify(question)}
 Keluaran tepat berupa objek JSON dengan kunci intent, status, deadline_scope.`;
@@ -166,7 +173,7 @@ Keluaran tepat berupa objek JSON dengan kunci intent, status, deadline_scope.`;
               intent: { type: 'STRING', enum: [...INTENTS] },
               status: {
                 type: 'STRING',
-                enum: ['', ...TASK_STATUSES, ...COMPETITION_STATUSES],
+                enum: ['none', ...TASK_STATUSES, ...COMPETITION_STATUSES],
               },
               deadline_scope: {
                 type: 'STRING',
@@ -183,6 +190,12 @@ Keluaran tepat berupa objek JSON dengan kunci intent, status, deadline_scope.`;
   }
 
   if (!providerResponse.ok) {
+    const providerBody = await providerResponse.text().catch(() => '');
+    console.error(
+      'Gemini request failed:',
+      providerResponse.status,
+      providerBody.slice(0, 1_000),
+    );
     throw new ProviderError(
       providerResponse.status === 429
         ? 'Layanan AI sedang sibuk. Coba lagi beberapa saat.'
@@ -274,10 +287,19 @@ async function runQuery(
 ): Promise<{ answer: string; columns: string[]; rows: ResultRow[] }> {
   const { intent, status } = classification;
 
+  if (intent === 'greeting' || intent === 'help') {
+    return {
+      answer:
+        'Halo! Saya TEMAN AI, asisten analitik workspace Anda. Saya bisa merangkum jumlah kompetisi, menampilkan tugas yang belum selesai, mencari deadline terdekat, menghitung progres kompetisi, melihat tugas per anggota, dan menjumlahkan biaya pendaftaran. Coba tanyakan salah satunya.',
+      columns: [],
+      rows: [],
+    };
+  }
+
   if (intent === 'unclear') {
     return {
       answer:
-        'Saya belum memahami pertanyaan itu. Coba tanyakan jumlah kompetisi/tugas, deadline terdekat, progres kompetisi, tugas per anggota, atau total biaya pendaftaran.',
+        'Saya belum menemukan analitik yang cocok untuk pertanyaan itu. Coba tanyakan hal seperti "Berapa kompetisi yang sedang aktif?", "Tampilkan tugas yang belum selesai", atau "Deadline apa yang paling dekat?".',
       columns: [],
       rows: [],
     };

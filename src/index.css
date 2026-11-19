@@ -126,6 +126,55 @@
   }
 }
 
+@keyframes teman-ai-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes teman-ai-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes teman-ai-dot {
+  0%,
+  80%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(0);
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+.teman-ai-backdrop {
+  animation: teman-ai-backdrop-in 160ms ease-out both;
+}
+
+.teman-ai-panel {
+  animation: teman-ai-panel-in 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.teman-ai-dot {
+  animation: teman-ai-dot 1s ease-in-out infinite;
+}
+
+.teman-ai-empty {
+  animation: teman-ai-panel-in 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
 .animate-teman-splash {
   animation: teman-splash-fade 380ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
@@ -137,7 +186,11 @@
 
 @media (prefers-reduced-motion: reduce) {
   .animate-teman-splash,
-  .animate-teman-bar {
+  .animate-teman-bar,
+  .teman-ai-backdrop,
+  .teman-ai-panel,
+  .teman-ai-empty,
+  .teman-ai-dot {
     animation: none;
   }
 }

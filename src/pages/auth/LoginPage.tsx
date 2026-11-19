@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import {
   AlertCircle,
@@ -6,10 +6,12 @@ import {
   CalendarDays,
   CheckCircle2,
   Columns3,
+  Download,
   Eye,
   EyeOff,
   Info,
   Lock,
+  Smartphone,
   Trophy,
   User,
 } from 'lucide-react';
@@ -30,6 +32,19 @@ const PREVIEW_TABS: { id: PreviewTab; label: string }[] = [
   { id: 'calendar', label: 'Kalender WIB' },
 ];
 
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
+
+function isIosDevice(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  return (
+    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+  );
+}
+
 export function LoginPage() {
   const { session, isLoading, isConfigured, authError, signIn, clearAuthError } =
     useAuth();
@@ -46,6 +61,58 @@ export function LoginPage() {
   }>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [isStandalone, setIsStandalone] = useState(false);
+  const [installFeedback, setInstallFeedback] = useState<string | null>(null);
+
+  useEffect(() => {
+    const standalone =
+      window.matchMedia('(display-mode: standalone)').matches ||
+      (window.navigator as unknown as { standalone?: boolean }).standalone === true;
+    setIsStandalone(standalone);
+
+    const handleBeforeInstall = (event: Event) => {
+      event.preventDefault();
+      setDeferredPrompt(event as BeforeInstallPromptEvent);
+    };
+    const handleInstalled = () => {
+      setIsStandalone(true);
+      setDeferredPrompt(null);
+      setInstallFeedback('Aplikasi TEMAN berhasil ditambahkan ke perangkat Anda.');
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstall);
+    window.addEventListener('appinstalled', handleInstalled);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
+      window.removeEventListener('appinstalled', handleInstalled);
+    };
+  }, []);
+
+  const handleInstallApp = async () => {
+    setInstallFeedback(null);
+
+    if (!deferredPrompt) {
+      setInstallFeedback(
+        isIosDevice()
+          ? 'Di iPhone/iPad: buka tombol Bagikan di Safari, lalu pilih "Tambah ke Layar Utama".'
+          : 'Buka menu browser (⋮), lalu pilih "Instal aplikasi" atau "Tambahkan ke layar utama".'
+      );
+      return;
+    }
+
+    await deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      setDeferredPrompt(null);
+      setIsStandalone(true);
+      setInstallFeedback('Aplikasi TEMAN berhasil ditambahkan ke perangkat Anda.');
+    } else {
+      setInstallFeedback('Pemasangan dibatalkan. Anda bisa mencoba lagi kapan saja.');
+    }
+  };
 
   if (!isLoading && session) {
     const redirectTo =
@@ -483,6 +550,43 @@ export function LoginPage() {
                 Akses privat tanpa pendaftaran publik. Akun dibuat dan dikelola langsung oleh Owner workspace.
               </span>
             </div>
+
+            {!isStandalone && (
+              <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3 dark:border-slate-800 dark:bg-slate-900/50">
+                <div className="flex items-start gap-2.5">
+                  <Smartphone
+                    className="mt-0.5 h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400"
+                    aria-hidden="true"
+                  />
+                  <div className="min-w-0">
+                    <p className="text-xs font-medium text-slate-900 dark:text-slate-100">
+                      Pasang TEMAN di layar utama
+                    </p>
+                    <p className="mt-0.5 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
+                      Tambahkan ikon aplikasi ke HP Anda untuk akses yang lebih cepat.
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => void handleInstallApp()}
+                  leftIcon={<Download className="h-3.5 w-3.5" aria-hidden="true" />}
+                  className="mt-2.5 w-full justify-center"
+                >
+                  Download Aplikasi (PWA)
+                </Button>
+                {installFeedback && (
+                  <p
+                    role="status"
+                    className="mt-2 text-[11px] leading-relaxed text-slate-600 dark:text-slate-300"
+                  >
+                    {installFeedback}
+                  </p>
+                )}
+              </div>
+            )}
 
             {!isConfigured && (
               <div
