@@ -1,10 +1,5 @@
 import { useRef, useState, type FormEvent } from 'react';
-import {
-  AlertCircle,
-  ArrowUp,
-  ShieldCheck,
-  Sparkles,
-} from 'lucide-react';
+import { AlertCircle, ArrowUp } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { askAIQuery } from '../../services/aiQueryService';
 import type { AIQueryResult } from '../../utils/aiQueryResult';
@@ -102,70 +97,30 @@ export function AIQueryAssistant() {
         onClose={() => setIsOpen(false)}
         title="Asisten Data TEMAN"
         description="Ringkas informasi kompetisi dan tugas dari workspace Anda."
-        maxWidth="2xl"
+        maxWidth="xl"
       >
-        <div className="space-y-5">
+        <div className="space-y-4">
           {conversation.length === 0 ? (
-            <div className="space-y-5">
-              <section className="rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 to-indigo-50/70 p-4 dark:border-blue-900/50 dark:from-blue-950/40 dark:to-indigo-950/30 sm:p-5">
-                <div className="flex items-start gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-blue-600 ring-1 ring-blue-100 dark:bg-slate-900 dark:text-blue-300 dark:ring-blue-900/60">
-                    <Sparkles className="h-5 w-5" aria-hidden="true" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                      Tanyakan dengan bahasa sehari-hari
-                    </p>
-                    <p className="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-300">
-                      Cari ringkasan jumlah kompetisi, progres tugas, biaya, atau
-                      tenggat tanpa menyusun filter sendiri.
-                    </p>
-                  </div>
-                </div>
-                <div className="mt-4 flex items-start gap-2 border-t border-blue-100/80 pt-3 text-xs leading-5 text-slate-600 dark:border-blue-900/50 dark:text-slate-300">
-                  <ShieldCheck
-                    className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400"
-                    aria-hidden="true"
-                  />
-                  <p>
-                    Jawaban mengikuti akses akun Anda. Data baris database tidak
-                    dikirim ke AI.
-                  </p>
-                </div>
-              </section>
-
-              <section aria-labelledby="ai-query-suggestions">
-                <div className="mb-2.5 flex items-center justify-between gap-3">
-                  <h4
-                    id="ai-query-suggestions"
-                    className="text-sm font-semibold text-slate-800 dark:text-slate-200"
+            <div className="space-y-3">
+              <p className="text-sm leading-6 text-slate-600 dark:text-slate-300">
+                Tanyakan ringkasan kompetisi, tugas, progres, atau biaya yang dapat
+                Anda akses.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {SUGGESTED_QUESTIONS.map((suggestion) => (
+                  <button
+                    key={suggestion}
+                    type="button"
+                    onClick={() => {
+                      setQuestion(suggestion);
+                      questionRef.current?.focus();
+                    }}
+                    className="rounded-full border border-slate-200 px-3 py-1.5 text-xs text-slate-600 transition-colors hover:border-blue-300 hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600/30 dark:border-slate-700 dark:text-slate-300 dark:hover:border-blue-800 dark:hover:bg-blue-950/30"
                   >
-                    Mulai dari contoh
-                  </h4>
-                  <span className="text-xs text-slate-500 dark:text-slate-400">
-                    Pilih untuk mengisi pertanyaan
-                  </span>
-                </div>
-                <div className="grid gap-2 sm:grid-cols-3">
-                  {SUGGESTED_QUESTIONS.map((suggestion) => (
-                    <button
-                      key={suggestion}
-                      type="button"
-                      onClick={() => {
-                        setQuestion(suggestion);
-                        questionRef.current?.focus();
-                      }}
-                      className="group flex min-h-14 items-start justify-between gap-2 rounded-xl border border-slate-200 bg-white px-3 py-3 text-left text-xs leading-5 text-slate-700 transition-colors hover:border-blue-300 hover:bg-blue-50/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600/30 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-blue-800 dark:hover:bg-blue-950/30"
-                    >
-                      <span>{suggestion}</span>
-                      <ArrowUp
-                        className="mt-0.5 h-3.5 w-3.5 shrink-0 rotate-45 text-slate-400 transition-colors group-hover:text-blue-600 dark:group-hover:text-blue-400"
-                        aria-hidden="true"
-                      />
-                    </button>
-                  ))}
-                </div>
-              </section>
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
             </div>
           ) : (
             <div
@@ -173,7 +128,7 @@ export function AIQueryAssistant() {
               aria-label="Percakapan dengan Asisten Data TEMAN"
               aria-live="polite"
               aria-relevant="additions"
-              className="max-h-[48vh] min-h-36 space-y-5 overflow-y-auto pr-1"
+              className="max-h-[48vh] min-h-28 space-y-4 overflow-y-auto pr-1"
             >
               {conversation.map((entry) => (
                 <div key={entry.id} className="space-y-3">
@@ -250,23 +205,9 @@ export function AIQueryAssistant() {
             </div>
           )}
 
-          <form
-            onSubmit={submitQuestion}
-            className="space-y-2.5 border-t border-slate-100 pt-4 dark:border-slate-800"
-          >
-            <div className="flex items-center justify-between gap-3">
-              <label
-                htmlFor="ai-query-question"
-                className="text-sm font-semibold text-slate-800 dark:text-slate-200"
-              >
-                Pertanyaan
-              </label>
-              <span className="text-xs tabular-nums text-slate-500 dark:text-slate-400">
-                {question.length}/400
-              </span>
-            </div>
+          <form onSubmit={submitQuestion} className="space-y-2 border-t border-slate-100 pt-4 dark:border-slate-800">
             <div
-              className={`relative rounded-xl border bg-white transition-colors focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10 dark:bg-slate-950 ${
+              className={`relative rounded-xl border bg-white transition-colors focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/15 dark:bg-slate-950 ${
                 isLoading
                   ? 'border-slate-200 dark:border-slate-800'
                   : 'border-slate-300 dark:border-slate-700'
@@ -275,7 +216,7 @@ export function AIQueryAssistant() {
               <textarea
                 ref={questionRef}
                 id="ai-query-question"
-                rows={2}
+                rows={1}
                 value={question}
                 onChange={(event) => setQuestion(event.target.value)}
                 onKeyDown={(event) => {
@@ -291,9 +232,9 @@ export function AIQueryAssistant() {
                 maxLength={400}
                 autoComplete="off"
                 disabled={isLoading}
-                aria-describedby="ai-query-keyboard-hint ai-query-privacy-note"
+                aria-label="Pertanyaan"
                 placeholder="Contoh: Berapa tugas yang sudah selesai?"
-                className="block min-h-24 w-full resize-none bg-transparent px-3.5 py-3 pr-14 text-sm leading-6 text-slate-900 placeholder:text-slate-400 focus:outline-none disabled:cursor-not-allowed disabled:text-slate-500 dark:text-slate-100 dark:placeholder:text-slate-500 dark:disabled:text-slate-500"
+                className="block min-h-14 w-full resize-none bg-transparent px-3.5 py-3 pr-14 text-sm leading-6 text-slate-900 placeholder:text-slate-400 focus:outline-none disabled:cursor-not-allowed disabled:text-slate-500 dark:text-slate-100 dark:placeholder:text-slate-500 dark:disabled:text-slate-500"
               />
               <Button
                 type="submit"
@@ -301,28 +242,14 @@ export function AIQueryAssistant() {
                 title="Kirim pertanyaan"
                 disabled={!question.trim() || isLoading}
                 isLoading={isLoading}
-                className="absolute bottom-2 right-2 h-10 w-10 px-0"
+                className="absolute bottom-1.5 right-1.5 h-10 w-10 px-0"
                 leftIcon={<ArrowUp className="h-4 w-4" />}
               />
             </div>
-            <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-1">
-              <p
-                id="ai-query-keyboard-hint"
-                className="text-xs text-slate-500 dark:text-slate-400"
-              >
-                Enter untuk kirim · Shift+Enter untuk baris baru
-              </p>
-              <p
-                id="ai-query-privacy-note"
-                className="flex items-start gap-1.5 text-xs leading-5 text-slate-500 dark:text-slate-400"
-              >
-                <ShieldCheck
-                  className="mt-0.5 h-3.5 w-3.5 shrink-0"
-                  aria-hidden="true"
-                />
-                Pertanyaan dikirim ke Gemini; isi data tetap di database.
-              </p>
-            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Pertanyaan dikirim ke Gemini; isi data tetap di database. Enter untuk
+              kirim, Shift+Enter untuk baris baru.
+            </p>
           </form>
         </div>
       </Modal>

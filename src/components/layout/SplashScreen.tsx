@@ -28,25 +28,23 @@ export function SplashScreen({ onComplete, durationMs = 800 }: SplashScreenProps
     <div
       role="status"
       aria-label="Memuat aplikasi TEMAN"
-      className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-50 text-slate-900 transition-opacity duration-200 dark:bg-slate-950 dark:text-white ${
+      className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-white text-slate-900 transition-opacity duration-200 ${
         fadingOut ? 'opacity-0' : 'opacity-100'
       }`}
     >
-      <div className="teman-grid-pattern pointer-events-none absolute inset-0 opacity-60" />
-
       <div className="animate-teman-splash relative flex flex-col items-center gap-4 px-6 text-center">
-        <BrandLogo size="lg" showWordmark={false} />
+        <BrandLogo size="md" showWordmark={false} />
         <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+          <h1 className="font-display text-2xl font-bold tracking-tight text-slate-900">
             TEMAN
           </h1>
-          <p className="mt-1 text-xs font-medium tracking-wide text-slate-500 dark:text-slate-400">
+          <p className="mt-1 text-xs font-medium tracking-wide text-slate-500">
             Team Management System
           </p>
         </div>
 
-        <div className="mt-2 h-1 w-28 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
-          <div className="animate-teman-bar h-full w-full bg-blue-600 dark:bg-blue-500" />
+        <div className="mt-2 h-1 w-28 overflow-hidden rounded-full bg-slate-200">
+          <div className="animate-teman-bar h-full w-full bg-blue-600" />
         </div>
       </div>
     </div>

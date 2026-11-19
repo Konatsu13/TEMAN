@@ -18,7 +18,7 @@ export function MobileBottomNav() {
     <>
       <nav
         aria-label="Navigasi mobile"
-        className="fixed inset-x-0 bottom-0 z-30 flex h-16 items-center justify-around border-t border-slate-200/90 bg-white/95 px-2 pb-[env(safe-area-inset-bottom)] backdrop-blur-md lg:hidden dark:border-slate-800/90 dark:bg-slate-950/95"
+        className="fixed inset-x-0 bottom-0 z-30 flex h-[calc(4rem+env(safe-area-inset-bottom))] items-center justify-around border-t border-slate-200/90 bg-white px-2 pb-[env(safe-area-inset-bottom)] backdrop-blur-md lg:hidden dark:border-slate-800/90 dark:bg-slate-950"
       >
         {primaryItems.map((item) => {
           const Icon = item.icon;
@@ -27,7 +27,7 @@ export function MobileBottomNav() {
               key={item.id}
               to={item.to}
               className={({ isActive }) =>
-                `flex min-h-12 min-w-14 flex-col items-center justify-center gap-1 rounded-xl px-2 py-1 text-[11px] font-medium transition-colors duration-150 select-none ${
+                `flex min-h-12 min-w-14 flex-col items-center justify-center gap-1 rounded-xl px-2 py-1 text-xs font-medium transition-colors duration-150 select-none ${
                   isActive
                     ? 'text-blue-600 dark:text-blue-400 font-semibold'
                     : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100'
@@ -54,7 +54,7 @@ export function MobileBottomNav() {
           onClick={() => setDrawerOpen(true)}
           aria-expanded={drawerOpen}
           aria-label="Menu lainnya"
-          className="relative flex min-h-12 min-w-14 flex-col items-center justify-center gap-1 rounded-xl px-2 py-1 text-[11px] font-medium text-slate-500 transition-colors hover:text-slate-900 select-none dark:text-slate-400 dark:hover:text-slate-100"
+          className="relative flex min-h-12 min-w-14 flex-col items-center justify-center gap-1 rounded-xl px-2 py-1 text-xs font-medium text-slate-500 transition-colors hover:text-slate-900 select-none dark:text-slate-400 dark:hover:text-slate-100"
         >
           <div className="relative">
             <MoreHorizontal className="h-5 w-5 shrink-0" aria-hidden="true" />

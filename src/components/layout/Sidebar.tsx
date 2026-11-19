@@ -66,7 +66,7 @@ export function Sidebar() {
   return (
     <aside
       aria-label="Navigasi utama workspace"
-      className="hidden w-64 shrink-0 flex-col border-r border-slate-200/90 bg-slate-50/70 backdrop-blur-xs lg:flex dark:border-slate-800/90 dark:bg-slate-950/80"
+      className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r border-slate-200/90 bg-slate-50/70 backdrop-blur-xs lg:flex dark:border-slate-800/90 dark:bg-slate-950/80"
     >
       {/* Brand Header */}
       <div className="flex h-16 items-center border-b border-slate-200/90 px-5 dark:border-slate-800/90">
