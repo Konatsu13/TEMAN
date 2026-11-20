@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Bell, LogOut, Search, X } from 'lucide-react';
+import { Bell, LogOut, Search, Wifi, WifiOff, X } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useNotifications } from '../../hooks/useNotifications';
+import { useOnlineStatus } from '../../hooks/useOnlineStatus';
 import { getInitials } from '../../utils/formatters';
 import { BrandLogo } from '../shared/BrandLogo';
 import { Badge } from '../ui/Badge';
@@ -14,6 +15,7 @@ export function TopHeader() {
   const navigate = useNavigate();
   const { profile, role, signOut } = useAuth();
   const { unreadCount } = useNotifications();
+  const isOnline = useOnlineStatus();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
@@ -93,8 +95,28 @@ export function TopHeader() {
         </div>
       </div>
 
-      {/* Right: Quick Search, Theme Toggle, Profile Menu */}
+      {/* Right: Online Status, Quick Search, Theme Toggle, Profile Menu */}
       <div className="flex items-center gap-2 sm:gap-3">
+        {/* Online / Offline status */}
+        <div
+          role="status"
+          aria-live="polite"
+          className={`flex h-9 shrink-0 items-center gap-1.5 rounded-lg border px-2.5 transition-colors ${
+            isOnline
+              ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-300'
+              : 'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-900/60 dark:bg-rose-950/40 dark:text-rose-300'
+          }`}
+        >
+          {isOnline ? (
+            <Wifi className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+          ) : (
+            <WifiOff className="h-3.5 w-3.5 text-rose-600 dark:text-rose-400" aria-hidden="true" />
+          )}
+          <span className="text-[10px] font-semibold tracking-wide whitespace-nowrap uppercase">
+            {isOnline ? 'Online' : 'Offline'}
+          </span>
+        </div>
+
         {/* Mobile Search Button */}
         <button
           type="button"

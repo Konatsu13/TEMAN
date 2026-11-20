@@ -551,42 +551,40 @@ export function LoginPage() {
               </span>
             </div>
 
-            {!isStandalone && (
-              <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3 dark:border-slate-800 dark:bg-slate-900/50">
-                <div className="flex items-start gap-2.5">
-                  <Smartphone
-                    className="mt-0.5 h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400"
-                    aria-hidden="true"
-                  />
-                  <div className="min-w-0">
-                    <p className="text-xs font-medium text-slate-900 dark:text-slate-100">
-                      Pasang TEMAN di layar utama
-                    </p>
-                    <p className="mt-0.5 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
-                      Tambahkan ikon aplikasi ke HP Anda untuk akses yang lebih cepat.
-                    </p>
-                  </div>
-                </div>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => void handleInstallApp()}
-                  leftIcon={<Download className="h-3.5 w-3.5" aria-hidden="true" />}
-                  className="mt-2.5 w-full justify-center"
-                >
-                  Download Aplikasi (PWA)
-                </Button>
-                {installFeedback && (
-                  <p
-                    role="status"
-                    className="mt-2 text-[11px] leading-relaxed text-slate-600 dark:text-slate-300"
-                  >
-                    {installFeedback}
+            <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3 dark:border-slate-800 dark:bg-slate-900/50">
+              <div className="flex items-start gap-2.5">
+                <Smartphone
+                  className="mt-0.5 h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400"
+                  aria-hidden="true"
+                />
+                <div className="min-w-0">
+                  <p className="text-xs font-medium text-slate-900 dark:text-slate-100">
+                    Pasang TEMAN di layar utama
                   </p>
-                )}
+                  <p className="mt-0.5 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
+                    Tambahkan ikon aplikasi ke HP Anda untuk akses yang lebih cepat.
+                  </p>
+                </div>
               </div>
-            )}
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={() => void handleInstallApp()}
+                leftIcon={<Download className="h-3.5 w-3.5" aria-hidden="true" />}
+                className="mt-2.5 w-full justify-center"
+              >
+                Download Aplikasi (PWA)
+              </Button>
+              {installFeedback && (
+                <p
+                  role="status"
+                  className="mt-2 text-[11px] leading-relaxed text-slate-600 dark:text-slate-300"
+                >
+                  {installFeedback}
+                </p>
+              )}
+            </div>
 
             {!isConfigured && (
               <div
