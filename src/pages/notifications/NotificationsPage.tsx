@@ -456,7 +456,7 @@ export function NotificationsPage() {
 
               {isStandalone && (
                 <Badge variant="primary" size="sm" className="hidden sm:inline-flex">
-                  <Smartphone className="mr-1 h-3 w-3" /> PWA Standalone
+                  PWA Standalone
                 </Badge>
               )}
             </div>
