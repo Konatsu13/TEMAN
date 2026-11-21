@@ -15,6 +15,7 @@ export interface NotificationItem {
   task_id: string | null;
   task_title?: string | null;
   read_at: string | null;
+  pushed_at?: string | null;
   created_at: string;
 }
 
@@ -66,7 +67,7 @@ function isPushDispatchResult(value: unknown): value is PushDispatchResult {
 }
 
 async function invokePushFunction(
-  body: { type: 'test' },
+  body: { type: 'test' } | { notification_id: string },
 ): Promise<PushDispatchResult> {
   const client = requireSupabaseClient();
   const { data, error } = await client.functions.invoke<unknown>('send-push', {
@@ -95,6 +96,12 @@ async function invokePushFunction(
 
 export function sendTestPushNotification(): Promise<PushDispatchResult> {
   return invokePushFunction({ type: 'test' });
+}
+
+export function dispatchPushNotification(
+  notificationId: string,
+): Promise<PushDispatchResult> {
+  return invokePushFunction({ notification_id: notificationId });
 }
 
 /**

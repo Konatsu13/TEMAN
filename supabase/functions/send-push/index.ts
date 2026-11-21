@@ -144,23 +144,17 @@ Deno.serve(async (request) => {
 
     const authorization = request.headers.get('Authorization') ?? '';
     const token = authorization.replace(/^Bearer\s+/i, '');
-    const isInternalRequest = token === serviceRoleKey;
-    let userId: string | null = null;
+    if (!token) throw new RequestError('Sesi pengguna tidak ditemukan.', 401);
+    const userClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: `Bearer ${token}` } },
+    });
+    const {
+      data: { user },
+      error: authError,
+    } = await userClient.auth.getUser(token);
 
-    if (!isInternalRequest) {
-      if (!token) throw new RequestError('Sesi pengguna tidak ditemukan.', 401);
-      const userClient = createClient(supabaseUrl, anonKey, {
-        global: { headers: { Authorization: `Bearer ${token}` } },
-      });
-      const {
-        data: { user },
-        error: authError,
-      } = await userClient.auth.getUser(token);
-
-      if (authError || !user) {
-        throw new RequestError('Sesi pengguna tidak valid.', 401);
-      }
-      userId = user.id;
+    if (authError || !user) {
+      throw new RequestError('Sesi pengguna tidak valid.', 401);
     }
 
     const admin = createClient(supabaseUrl, serviceRoleKey, {
@@ -174,25 +168,25 @@ Deno.serve(async (request) => {
       throw new RequestError('Body permintaan harus berupa JSON.');
     }
 
-    const isTestRequest = body.type === 'test' && !isInternalRequest;
+    const isTestRequest = body.type === 'test';
     const notificationId =
       typeof body.notification_id === 'string' ? body.notification_id : null;
 
+    if (isTestRequest && notificationId) {
+      throw new RequestError('Permintaan uji coba tidak boleh menyertakan notification_id.');
+    }
     if (!isTestRequest && !notificationId) {
       throw new RequestError('Jenis permintaan Web Push tidak valid.');
     }
-    if (isInternalRequest && !notificationId) {
-      throw new RequestError('Permintaan internal harus menyertakan notification_id.');
-    }
 
     let notification: NotificationRow | null = null;
-    let targetUserId = userId;
+    let targetUserId = user.id;
     if (notificationId) {
       let query = admin
         .from('notifications')
         .select('id, user_id, type, title, body, task_id, competition_id, pushed_at')
-        .eq('id', notificationId);
-      if (userId) query = query.eq('user_id', userId);
+        .eq('id', notificationId)
+        .eq('user_id', user.id);
 
       const { data, error } = await query.maybeSingle();
       if (error) throw new Error(`Gagal memuat notifikasi: ${error.message}`);

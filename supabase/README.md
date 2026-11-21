@@ -71,24 +71,19 @@ Review and run `supabase/migrations/003_theme_presets_and_profile_background.sql
 
 ## 8. Web Push & Reminder Notifications
 
-Review and run `supabase/migrations/004_notifications_and_web_push.sql` in the Supabase SQL Editor. It schedules a deduplicated reminder once an active competition deadline, unfinished task deadline, or calendar event is within 24 hours. New notification rows are forwarded to all Web Push subscriptions for the recipient.
-
-Before relying on server-side delivery:
+The app keeps its existing notification sources. `send-push` is used by the “Uji Coba” button and to forward a notification received through Realtime to the user's other subscribed devices. No additional database migration or Supabase Vault setup is needed.
 
 1. Generate a VAPID key pair, for example with `npx --yes web-push generate-vapid-keys --json`.
 2. Put the matching public key in the root `.env` as `VITE_VAPID_PUBLIC_KEY`. This value is public, but must match the server key.
-3. Configure the private key only as an Edge Function secret and deploy the sender:
+3. Configure the VAPID keys as Edge Function secrets and deploy the sender:
 
 ```powershell
 supabase secrets set VAPID_PUBLIC_KEY=your-public-key VAPID_PRIVATE_KEY=your-private-key VAPID_SUBJECT=mailto:admin@example.com APP_URL=https://your-app.example
 supabase functions deploy send-push
 ```
 
-4. Enable Supabase Vault and store two secrets with these exact names:
-   - `teman_push_function_url`: `https://<project-ref>.supabase.co/functions/v1/send-push`
-   - `teman_push_service_role_key`: the project's service-role key
+4. On each phone/browser that should receive pushes, sign in to the same TEMAN account, grant notification permission, and enable Web Push once. The “Uji Coba” button then sends a server-side push to every device registered to that account.
 
-   Create these through the Supabase Vault UI or `vault.create_secret`. The service-role key must never be added to frontend environment variables or committed.
-5. On each phone/browser that should receive pushes, sign in to the same TEMAN account, grant notification permission, and enable Web Push once. The “Uji Coba” button then sends a server-side push to every device registered to that account.
+Automatic cross-device forwarding of a new notification requires at least one signed-in app session for that recipient to be connected to Realtime. A database webhook/Vault setup would be needed to send automatically when all app sessions are closed.
 
 The MP3 at `assets/notification.mp3` plays for mention/deadline notifications while the app page is open. Web Push displayed while the app is backgrounded or closed uses the browser/operating system's notification sound; the Web Notifications API does not allow a service worker to select a custom MP3.

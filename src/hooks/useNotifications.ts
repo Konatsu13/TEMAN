@@ -6,6 +6,7 @@ import {
   fetchUnreadNotificationCount,
   markNotificationAsRead as markAsReadService,
   markAllNotificationsAsRead as markAllAsReadService,
+  dispatchPushNotification,
   playNotificationSound,
   type NotificationItem,
 } from '../services/notificationService';
@@ -78,6 +79,11 @@ export function useNotifications() {
             const inserted = payload.new as Partial<NotificationItem>;
             if (inserted.id && (inserted.type === 'mention' || inserted.type === 'deadline')) {
               playNotificationSound(inserted.id);
+            }
+            if (inserted.id && !inserted.pushed_at) {
+              void dispatchPushNotification(inserted.id).catch((err: unknown) => {
+                console.error('Gagal mengirim notifikasi ke perangkat lain:', err);
+              });
             }
           }
           void loadRef.current();
