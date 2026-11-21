@@ -62,20 +62,20 @@ export function Modal({
 
       {/* Modal Surface */}
       <div
-        className={`relative z-10 flex max-h-[90vh] w-full ${MAX_WIDTH_CLASSES[maxWidth]} flex-col rounded-2xl border border-slate-200 bg-white shadow-2xl transition-all duration-150 dark:border-slate-800 dark:bg-slate-900`}
+        className={`relative z-10 flex max-h-[90vh] w-full ${MAX_WIDTH_CLASSES[maxWidth]} flex-col rounded-2xl border border-[var(--surface-border)] bg-[var(--surface-bg)] shadow-2xl transition-all duration-150`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-start justify-between border-b border-slate-100 p-5 pb-4 dark:border-slate-800">
+        <div className="flex items-start justify-between border-b border-[var(--surface-border)] p-5 pb-4">
           <div>
             <h3
               id="modal-title"
-              className="font-display text-base font-bold text-slate-900 dark:text-slate-100"
+              className="font-display text-base font-bold text-[var(--text-main)]"
             >
               {title}
             </h3>
             {description && (
-              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+              <p className="mt-1 text-xs text-[var(--text-sub)]">
                 {description}
               </p>
             )}
@@ -84,7 +84,7 @@ export function Modal({
             type="button"
             onClick={onClose}
             aria-label="Tutup dialog"
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--text-mute)] transition-colors hover:bg-[var(--surface-hover)] hover:text-[var(--text-main)]"
           >
             <X className="h-4 w-4" />
           </button>

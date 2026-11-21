@@ -20,17 +20,17 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const VARIANT_CLASSES: Record<ButtonVariant, string> = {
   primary:
-    'bg-blue-600 text-white border-transparent hover:bg-blue-700 active:bg-blue-800 shadow-xs dark:bg-blue-600 dark:hover:bg-blue-500 dark:active:bg-blue-700',
+    'bg-[var(--primary)] text-[var(--primary-contrast)] border-transparent hover:bg-[var(--primary-hover)] active:opacity-90 shadow-xs',
   secondary:
-    'bg-white text-slate-800 border-slate-200 hover:bg-slate-50 hover:text-slate-900 active:bg-slate-100 shadow-xs dark:bg-slate-900 dark:text-slate-100 dark:border-slate-700 dark:hover:bg-slate-800 dark:hover:border-slate-600',
+    'bg-[var(--surface-bg)] text-[var(--text-main)] border-[var(--surface-border)] hover:bg-[var(--surface-hover)] shadow-xs',
   outline:
-    'bg-transparent text-slate-700 border-slate-300 hover:bg-slate-100/70 hover:text-slate-900 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-slate-800/80 dark:hover:text-slate-100',
+    'bg-transparent text-[var(--text-sub)] border-[var(--border-strong)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-main)]',
   subtle:
-    'bg-slate-100 text-slate-700 border-transparent hover:bg-slate-200/80 hover:text-slate-900 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-slate-100',
+    'bg-[var(--surface-elevated)] text-[var(--text-sub)] border-transparent hover:bg-[var(--surface-hover)] hover:text-[var(--text-main)]',
   ghost:
-    'bg-transparent text-slate-600 border-transparent hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100',
+    'bg-transparent text-[var(--text-sub)] border-transparent hover:bg-[var(--surface-hover)] hover:text-[var(--text-main)]',
   danger:
-    'bg-rose-600 text-white border-transparent hover:bg-rose-700 active:bg-rose-800 shadow-xs dark:bg-rose-600 dark:hover:bg-rose-500',
+    'bg-[var(--danger)] text-white border-transparent hover:brightness-90 active:brightness-80 shadow-xs',
 };
 
 const SIZE_CLASSES: Record<ButtonSize, string> = {
@@ -55,7 +55,7 @@ export function Button({
     <button
       type={type}
       disabled={disabled || isLoading}
-      className={`inline-flex items-center justify-center font-medium whitespace-nowrap shrink-0 border transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 select-none dark:focus-visible:ring-offset-slate-950 ${VARIANT_CLASSES[variant]} ${SIZE_CLASSES[size]} ${className}`}
+      className={`inline-flex items-center justify-center font-medium whitespace-nowrap shrink-0 border transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 select-none ${VARIANT_CLASSES[variant]} ${SIZE_CLASSES[size]} ${className}`}
       {...props}
     >
       {isLoading ? (

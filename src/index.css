@@ -1,34 +1,33 @@
 @import "tailwindcss";
+@import "./styles/themes.css";
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
   --font-display: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
-}
-
-:root {
-  --canvas-bg: #f8fafc;
-  --surface-bg: #ffffff;
-  --surface-elevated: #f1f5f9;
-  --surface-border: #e2e8f0;
-  --text-main: #0f172a;
-  --text-sub: #475569;
-  --text-mute: #94a3b8;
-  --entity-name: #315a86;
-  color-scheme: light;
-}
-
-.dark {
-  --canvas-bg: #090d16;
-  --surface-bg: #0f172a;
-  --surface-elevated: #1e293b;
-  --surface-border: #1e293b;
-  --text-main: #f8fafc;
-  --text-sub: #94a3b8;
-  --text-mute: #64748b;
-  --entity-name: #8fb4dd;
-  color-scheme: dark;
+  --color-slate-50: var(--palette-slate-50);
+  --color-slate-100: var(--palette-slate-100);
+  --color-slate-200: var(--palette-slate-200);
+  --color-slate-300: var(--palette-slate-300);
+  --color-slate-400: var(--palette-slate-400);
+  --color-slate-500: var(--palette-slate-500);
+  --color-slate-600: var(--palette-slate-600);
+  --color-slate-700: var(--palette-slate-700);
+  --color-slate-800: var(--palette-slate-800);
+  --color-slate-900: var(--palette-slate-900);
+  --color-slate-950: var(--palette-slate-950);
+  --color-blue-50: var(--palette-blue-50);
+  --color-blue-100: var(--palette-blue-100);
+  --color-blue-200: var(--palette-blue-200);
+  --color-blue-300: var(--palette-blue-300);
+  --color-blue-400: var(--palette-blue-400);
+  --color-blue-500: var(--palette-blue-500);
+  --color-blue-600: var(--palette-blue-600);
+  --color-blue-700: var(--palette-blue-700);
+  --color-blue-800: var(--palette-blue-800);
+  --color-blue-900: var(--palette-blue-900);
+  --color-blue-950: var(--palette-blue-950);
 }
 
 @layer base {
@@ -61,9 +60,90 @@
   }
 
   ::selection {
-    background-color: rgba(37, 99, 235, 0.25);
+    background-color: color-mix(in srgb, var(--primary) 25%, transparent);
     color: inherit;
   }
+}
+
+/* Semantic theme tokens — use these instead of hardcoded palette colors */
+.app-canvas {
+  background-color: var(--canvas-bg);
+  color: var(--text-main);
+}
+.app-surface {
+  background-color: var(--surface-bg);
+  border-color: var(--surface-border);
+}
+.app-surface-elevated {
+  background-color: var(--surface-elevated);
+}
+.app-surface-hover:hover {
+  background-color: var(--surface-hover);
+}
+.app-border {
+  border-color: var(--surface-border);
+}
+.app-border-strong {
+  border-color: var(--border-strong);
+}
+.app-text-primary {
+  color: var(--text-main);
+}
+.app-text-secondary {
+  color: var(--text-sub);
+}
+.app-text-muted {
+  color: var(--text-mute);
+}
+.app-primary {
+  color: var(--primary);
+}
+.app-primary-bg {
+  background-color: var(--primary);
+  color: var(--primary-contrast);
+}
+.app-primary-soft {
+  background-color: var(--primary-soft);
+  color: var(--primary);
+}
+.app-focus-ring:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+.app-entity-name {
+  color: var(--entity-name);
+}
+.app-success {
+  color: var(--success);
+}
+.app-warning {
+  color: var(--warning);
+}
+.app-danger {
+  color: var(--danger);
+}
+.app-info {
+  color: var(--info);
+}
+.app-status-success {
+  color: var(--success);
+  background-color: color-mix(in srgb, var(--success) 12%, var(--surface-bg));
+  border-color: color-mix(in srgb, var(--success) 30%, var(--surface-border));
+}
+.app-status-warning {
+  color: var(--warning);
+  background-color: color-mix(in srgb, var(--warning) 12%, var(--surface-bg));
+  border-color: color-mix(in srgb, var(--warning) 30%, var(--surface-border));
+}
+.app-status-danger {
+  color: var(--danger);
+  background-color: color-mix(in srgb, var(--danger) 12%, var(--surface-bg));
+  border-color: color-mix(in srgb, var(--danger) 30%, var(--surface-border));
+}
+.app-status-info {
+  color: var(--info);
+  background-color: color-mix(in srgb, var(--info) 12%, var(--surface-bg));
+  border-color: color-mix(in srgb, var(--info) 30%, var(--surface-border));
 }
 
 /* Custom scrollbars for productivity layout */
@@ -77,33 +157,25 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.4);
+  background: var(--scrollbar-thumb);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.7);
-}
-
-.dark ::-webkit-scrollbar-thumb {
-  background: rgba(51, 65, 85, 0.6);
-}
-
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: rgba(71, 85, 105, 0.8);
+  background: color-mix(in srgb, var(--scrollbar-thumb) 75%, var(--text-sub));
 }
 
 .teman-grid-pattern {
   background-image:
-    linear-gradient(to right, rgba(148, 163, 184, 0.08) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+    linear-gradient(to right, color-mix(in srgb, var(--border-strong) 8%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--border-strong) 8%, transparent) 1px, transparent 1px);
   background-size: 32px 32px;
 }
 
 .dark .teman-grid-pattern {
   background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    linear-gradient(to right, color-mix(in srgb, var(--border-strong) 18%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--border-strong) 18%, transparent) 1px, transparent 1px);
 }
 
 @keyframes teman-splash-fade {

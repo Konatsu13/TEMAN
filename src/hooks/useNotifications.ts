@@ -6,6 +6,7 @@ import {
   fetchUnreadNotificationCount,
   markNotificationAsRead as markAsReadService,
   markAllNotificationsAsRead as markAllAsReadService,
+  playNotificationSound,
   type NotificationItem,
 } from '../services/notificationService';
 
@@ -72,7 +73,13 @@ export function useNotifications() {
           table: 'notifications',
           filter: `user_id=eq.${userId}`,
         },
-        () => {
+        (payload) => {
+          if (payload.eventType === 'INSERT') {
+            const inserted = payload.new as Partial<NotificationItem>;
+            if (inserted.id && (inserted.type === 'mention' || inserted.type === 'deadline')) {
+              playNotificationSound(inserted.id);
+            }
+          }
           void loadRef.current();
         }
       )

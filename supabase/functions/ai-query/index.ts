@@ -9,6 +9,7 @@ const corsHeaders = {
 const INTENTS = [
   'count_competitions',
   'count_tasks',
+  'count_unfinished_tasks',
   'unfinished_tasks',
   'nearest_deadline',
   'competition_progress',
@@ -141,6 +142,7 @@ Skema ringkas:
 Intent:
 count_competitions (jumlah kompetisi; status opsional)
 count_tasks (jumlah tugas; status opsional)
+count_unfinished_tasks (jumlah tugas yang belum selesai: todo, in_progress, atau review)
 unfinished_tasks (daftar tugas belum selesai)
 nearest_deadline (deadline kompetisi atau tugas paling dekat)
 competition_progress (progres tiap kompetisi dari tugas done / semua tugas)
@@ -149,6 +151,11 @@ total_registration_cost (total biaya pendaftaran)
 greeting (sapaan seperti halo, hai, pagi, atau terima kasih)
 help (pengguna menanyakan apa saja yang bisa asisten lakukan)
 unclear (tidak didukung atau ambigu)
+Contoh:
+- "Berapa tugas yang belum selesai?" -> count_unfinished_tasks
+- "Tampilkan tugas yang masih berjalan" -> unfinished_tasks dengan status in_progress
+- "Apa deadline paling dekat?" -> nearest_deadline
+- Pertanyaan pengetahuan umum -> unclear agar chat dapat menjawab secara umum.
 Status harus salah satu status kompetisi/tugas di atas, atau "none" bila pertanyaan tidak memfilter status.
 deadline_scope harus competition, task, atau any.
 Pertanyaan pengguna: ${JSON.stringify(question)}
@@ -333,6 +340,30 @@ async function runQuery(
     }
     if (emptyScope(competitionIds)) {
       return { answer: 'Belum ada tugas pada kompetisi yang Anda ikuti.', columns: [], rows: [] };
+    }
+
+    if (intent === 'count_unfinished_tasks') {
+      if (emptyScope(competitionIds)) {
+        return {
+          answer: 'Tidak ada tugas belum selesai pada kompetisi yang Anda ikuti.',
+          columns: ['Jumlah tugas belum selesai'],
+          rows: [{ 'Jumlah tugas belum selesai': 0 }],
+        };
+      }
+
+      let query = client
+        .from('tasks')
+        .select('id', { count: 'exact', head: true })
+        .in('status', ['todo', 'in_progress', 'review']);
+      if (competitionIds) query = query.in('competition_id', competitionIds);
+      const { count, error } = await query;
+      if (error) throw new Error('Gagal menghitung tugas belum selesai.');
+      const total = count || 0;
+      return {
+        answer: `Ada ${total} tugas yang belum selesai.`,
+        columns: ['Jumlah tugas belum selesai'],
+        rows: [{ 'Jumlah tugas belum selesai': total }],
+      };
     }
 
     let query = client.from('tasks').select('id', { count: 'exact', head: true });
@@ -664,7 +695,10 @@ Deno.serve(async (request) => {
     const classification = await classifyQuestion(question);
     const competitionIds = await getCompetitionIds(client, user.id, role.role);
     const result = await runQuery(client, classification, competitionIds);
-    return response(request, result);
+    return response(request, {
+      ...result,
+      supported: classification.intent !== 'unclear',
+    });
   } catch (error) {
     if (error instanceof RequestError || error instanceof ProviderError) {
       return response(request, { error: error.message }, error.status);

@@ -34,3 +34,61 @@ Sebelum memakai fitur:
 3. Deploy dengan `supabase functions deploy ai-query`.
 
 `SUPABASE_URL` dan `SUPABASE_ANON_KEY` disediakan oleh lingkungan Edge Function. RLS tetap diterapkan pada query; Member juga dibatasi secara eksplisit ke kompetisi yang tercatat pada `competition_members`. Tidak ada migration database yang diperlukan.
+
+## 6. Global Chat & AI Mention
+
+Global Chat adalah satu kanal publik untuk seluruh anggota aktif. Jalankan migration berikut melalui **Supabase SQL Editor** setelah meninjaunya:
+
+- `supabase/migrations/002_global_chat.sql`
+  - Membuat tabel `public.chat_messages` (pesan manusia dan balasan AI).
+  - Menambahkan index waktu, index unik satu balasan AI per pesan, serta constraint panjang pesan.
+  - Mengaktifkan RLS: anggota aktif dapat membaca; penulis hanya dapat menulis/mengedit pesannya sendiri; balasan AI hanya boleh dibuat oleh penulis pesan yang menyebut `@ai`/`@teman`; penulis dan Owner dapat menghapus.
+  - Membuat helper RLS `is_valid_chat_ai_reply` untuk memvalidasi balasan AI.
+  - Membuat helper `notify_chat_mentions` untuk notifikasi in-app dari pesan yang sesungguhnya ditulis pengguna.
+  - Menambahkan tabel ke publication `supabase_realtime` untuk sinkronisasi INSERT/UPDATE/DELETE.
+
+Migration ini **tidak dijalankan otomatis** oleh repository. Tanpa migration, halaman `/chat` akan menampilkan instruksi setup.
+
+### Edge Function `chat-ai`
+
+`chat-ai` menerima `message_id`, memverifikasi sesi dan kepemilikan pesan, memuat konteks workspace yang boleh diakses pemanggil, memanggil Gemini untuk pertanyaan umum, lalu menyimpan satu balasan AI. Pertanyaan analitik diteruskan ke `ai-query`, yang hanya menjalankan query baca-terbatas yang sudah ditentukan menggunakan token pengguna; model tidak menghasilkan SQL yang dieksekusi langsung. `GEMINI_API_KEY` hanya berada di server.
+
+1. Gunakan `GEMINI_API_KEY`, `GEMINI_MODEL`, dan `APP_URL` dari setup AI di atas pada `.env` root.
+2. Jalankan `supabase functions serve chat-ai --env-file .env`. Jika ingin NL2SQL analitik, jalankan `supabase functions serve ai-query --env-file .env` pada terminal terpisah.
+3. Untuk production, atur secrets dan deploy kedua function:
+
+```powershell
+supabase secrets set GEMINI_API_KEY=your-key GEMINI_MODEL=gemini-3.5-flash-lite APP_URL=https://your-app.example
+supabase functions deploy ai-query
+supabase functions deploy chat-ai
+```
+
+Jangan menaruh `GEMINI_API_KEY` di variabel `VITE_*` atau commit ke repository. `SUPABASE_URL` dan `SUPABASE_ANON_KEY` tetap disediakan oleh lingkungan Edge Function. Tanpa `ai-query`, percakapan umum tetap berfungsi, tetapi pertanyaan analitik workspace tidak tersedia.
+
+## 7. Theme Presets & Profile Background
+
+Review and run `supabase/migrations/003_theme_presets_and_profile_background.sql` manually in the Supabase SQL Editor. It adds `theme_preset` and `profile_background_color` to `public.profiles`, validates both values, and restricts preference updates to the signed-in user's own profile. The repository does not apply this migration automatically; profile preference sync will fail until it has been run.
+
+## 8. Web Push & Reminder Notifications
+
+Review and run `supabase/migrations/004_notifications_and_web_push.sql` in the Supabase SQL Editor. It schedules a deduplicated reminder once an active competition deadline, unfinished task deadline, or calendar event is within 24 hours. New notification rows are forwarded to all Web Push subscriptions for the recipient.
+
+Before relying on server-side delivery:
+
+1. Generate a VAPID key pair, for example with `npx --yes web-push generate-vapid-keys --json`.
+2. Put the matching public key in the root `.env` as `VITE_VAPID_PUBLIC_KEY`. This value is public, but must match the server key.
+3. Configure the private key only as an Edge Function secret and deploy the sender:
+
+```powershell
+supabase secrets set VAPID_PUBLIC_KEY=your-public-key VAPID_PRIVATE_KEY=your-private-key VAPID_SUBJECT=mailto:admin@example.com APP_URL=https://your-app.example
+supabase functions deploy send-push
+```
+
+4. Enable Supabase Vault and store two secrets with these exact names:
+   - `teman_push_function_url`: `https://<project-ref>.supabase.co/functions/v1/send-push`
+   - `teman_push_service_role_key`: the project's service-role key
+
+   Create these through the Supabase Vault UI or `vault.create_secret`. The service-role key must never be added to frontend environment variables or committed.
+5. On each phone/browser that should receive pushes, sign in to the same TEMAN account, grant notification permission, and enable Web Push once. The “Uji Coba” button then sends a server-side push to every device registered to that account.
+
+The MP3 at `assets/notification.mp3` plays for mention/deadline notifications while the app page is open. Web Push displayed while the app is backgrounded or closed uses the browser/operating system's notification sound; the Web Notifications API does not allow a service worker to select a custom MP3.

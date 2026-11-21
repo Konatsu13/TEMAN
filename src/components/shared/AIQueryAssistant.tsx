@@ -14,6 +14,7 @@ import {
   Trash2,
   X,
 } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { askAIQuery } from '../../services/aiQueryService';
 import type { AIQueryCell, AIQueryResult } from '../../utils/aiQueryResult';
@@ -186,6 +187,7 @@ function ResultTable({ result }: { result: AIQueryResult }) {
 
 export function AIQueryAssistant() {
   const { session } = useAuth();
+  const { pathname } = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [question, setQuestion] = useState('');
   const [conversation, setConversation] = useState<ConversationEntry[]>([]);
@@ -234,7 +236,13 @@ export function AIQueryAssistant() {
     node.style.height = `${Math.min(node.scrollHeight, 112)}px`;
   }, [question, isOpen]);
 
-  if (!session) return null;
+  // Global Chat already exposes @ai in its composer. Hiding the floating
+  // analytics assistant there also prevents it from covering the composer.
+  useEffect(() => {
+    if (pathname.startsWith('/chat')) setIsOpen(false);
+  }, [pathname]);
+
+  if (!session || pathname.startsWith('/chat')) return null;
 
   const runQuestion = async (id: number, submittedQuestion: string) => {
     setIsLoading(true);

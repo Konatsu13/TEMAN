@@ -1,5 +1,6 @@
 import { requireSupabaseClient } from '../lib/supabase';
 import type { Database, NotificationType } from '../types/database.types';
+import notificationSoundUrl from '../../assets/notification.mp3';
 
 export interface NotificationItem {
   id: string;
@@ -25,6 +26,75 @@ export interface PushSubscriptionRecord {
   auth: string;
   user_agent: string | null;
   created_at: string;
+}
+
+export interface PushDispatchResult {
+  sent: number;
+  total: number;
+}
+
+const playedNotificationIds = new Set<string>();
+
+export function playNotificationSound(notificationId?: string): void {
+  if (notificationId) {
+    if (playedNotificationIds.has(notificationId)) return;
+    playedNotificationIds.add(notificationId);
+    if (playedNotificationIds.size > 100) {
+      const oldest = playedNotificationIds.values().next().value;
+      if (oldest) playedNotificationIds.delete(oldest);
+    }
+  }
+
+  const audio = new Audio(notificationSoundUrl);
+  audio.volume = 0.8;
+  void audio.play().catch((error: unknown) => {
+    console.warn('Tidak dapat memutar suara notifikasi:', error);
+  });
+}
+
+function isPushDispatchResult(value: unknown): value is PushDispatchResult {
+  if (!value || typeof value !== 'object') return false;
+  const result = value as Record<string, unknown>;
+  return (
+    typeof result.sent === 'number' &&
+    Number.isInteger(result.sent) &&
+    result.sent >= 0 &&
+    typeof result.total === 'number' &&
+    Number.isInteger(result.total) &&
+    result.total >= result.sent
+  );
+}
+
+async function invokePushFunction(
+  body: { type: 'test' },
+): Promise<PushDispatchResult> {
+  const client = requireSupabaseClient();
+  const { data, error } = await client.functions.invoke<unknown>('send-push', {
+    body,
+  });
+
+  if (error) {
+    let message = error.message || 'Gagal mengirim Web Push.';
+    const context = (error as { context?: unknown }).context;
+    if (typeof Response !== 'undefined' && context instanceof Response) {
+      try {
+        const payload = (await context.clone().json()) as { error?: unknown };
+        if (typeof payload.error === 'string') message = payload.error;
+      } catch {
+        // Keep the invoke error when the Edge Function did not return JSON.
+      }
+    }
+    throw new Error(message);
+  }
+
+  if (!isPushDispatchResult(data)) {
+    throw new Error('Layanan Web Push mengembalikan respons yang tidak valid.');
+  }
+  return data;
+}
+
+export function sendTestPushNotification(): Promise<PushDispatchResult> {
+  return invokePushFunction({ type: 'test' });
 }
 
 /**
@@ -230,35 +300,4 @@ export async function checkPushSubscriptionInDb(
     .maybeSingle();
 
   return Boolean(data);
-}
-
-/**
- * Trigger local browser notification via registered Service Worker.
- */
-export async function triggerLocalTestNotification(title: string, body: string): Promise<boolean> {
-  if (!('serviceWorker' in navigator) || !('Notification' in window)) {
-    return false;
-  }
-
-  if (Notification.permission !== 'granted') {
-    const perm = await Notification.requestPermission();
-    if (perm !== 'granted') return false;
-  }
-
-  const registration = await navigator.serviceWorker.ready;
-  if (registration && registration.showNotification) {
-    await registration.showNotification(title, {
-      body,
-      icon: '/logo-app.png',
-      badge: '/favicon.png',
-      data: { url: '/notifications' },
-    });
-    return true;
-  }
-
-  new Notification(title, {
-    body,
-    icon: '/logo-app.png',
-  });
-  return true;
 }

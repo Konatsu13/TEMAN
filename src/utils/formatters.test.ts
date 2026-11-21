@@ -1,11 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  formatChatDayWIB,
   formatCurrencyIDR,
   formatDateTimeLocalWIB,
   formatDateTimeWIB,
   formatDateWIB,
   formatFileSize,
+  formatTimeWIB,
   getInitials,
   parseDateTimeLocalWIB,
 } from './formatters';
@@ -48,4 +50,17 @@ test('formatFileSize formats byte units correctly', () => {
   assert.equal(formatFileSize(500), '500 B');
   assert.equal(formatFileSize(1024), '1.0 KB');
   assert.equal(formatFileSize(1048576), '1.0 MB');
+});
+
+test('formatTimeWIB and formatChatDayWIB use the WIB day boundary', () => {
+  const now = new Date('2026-11-21T05:00:00.000Z'); // 12:00 WIB
+  const today = '2026-11-21T02:05:00.000Z'; // 09:05 WIB
+  const yesterday = '2026-11-20T16:30:00.000Z'; // 23:30 WIB, previous day
+  const older = '2026-11-18T02:05:00.000Z';
+
+  assert.equal(formatTimeWIB(today), '09:05');
+  assert.equal(formatChatDayWIB(today, now), 'Hari ini');
+  assert.equal(formatChatDayWIB(yesterday, now), 'Kemarin');
+  assert.match(formatChatDayWIB(older, now), /18/);
+  assert.equal(formatTimeWIB(null), '—');
 });

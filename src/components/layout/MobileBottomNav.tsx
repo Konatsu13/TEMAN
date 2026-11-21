@@ -29,7 +29,7 @@ export function MobileBottomNav() {
               className={({ isActive }) =>
                 `flex min-h-12 min-w-14 flex-col items-center justify-center gap-1 rounded-xl px-2 py-1 text-xs font-medium transition-colors duration-150 select-none ${
                   isActive
-                    ? 'text-blue-600 dark:text-blue-400 font-semibold'
+                    ? 'text-[var(--primary)] font-semibold'
                     : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100'
                 }`
               }

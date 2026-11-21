@@ -6,6 +6,8 @@ import {
 } from '../lib/supabase';
 import type { AppRole, Tables, UserSessionProfile } from '../types/database.types';
 import { buildInternalAuthEmail, normalizeUsername } from '../utils/authValidation';
+import type { ThemePresetId } from '../config/theme-presets';
+import { isValidProfileColor } from '../utils/profileColor';
 
 export interface AuthSignInResponse {
   session: Session;
@@ -41,7 +43,7 @@ export async function fetchUserSessionProfile(
   const [profileRes, roleRes] = await Promise.all([
     client
       .from('profiles')
-      .select('id, username, full_name, is_active, created_at, updated_at')
+      .select('id, username, full_name, is_active, theme_preset, profile_background_color, created_at, updated_at')
       .eq('id', userId)
       .maybeSingle(),
     client
@@ -169,6 +171,49 @@ export async function signInWithUsername(
     user,
     userProfile,
   };
+}
+
+export async function updateThemePreset(
+  userId: string,
+  themePreset: ThemePresetId,
+): Promise<void> {
+  const client = requireSupabaseClient();
+  const { data, error } = await client
+    .from('profiles')
+    .update({ theme_preset: themePreset })
+    .eq('id', userId)
+    .select('id')
+    .maybeSingle();
+  if (error) {
+    throw new Error(`Gagal menyimpan tema: ${error.message}`);
+  }
+  if (!data) {
+    throw new Error('Gagal menyimpan tema: profil pengguna tidak dapat diperbarui.');
+  }
+}
+
+export async function updateProfileBackgroundColor(
+  userId: string,
+  color: string | null,
+): Promise<void> {
+  if (color !== null && !isValidProfileColor(color)) {
+    throw new Error('Warna profil harus berformat HEX enam digit (#RRGGBB).');
+  }
+  const client = requireSupabaseClient();
+  const { data, error } = await client
+    .from('profiles')
+    .update({ profile_background_color: color })
+    .eq('id', userId)
+    .select('id')
+    .maybeSingle();
+  if (error) {
+    throw new Error(`Gagal menyimpan warna profil: ${error.message}`);
+  }
+  if (!data) {
+    throw new Error(
+      'Gagal menyimpan warna profil: profil pengguna tidak dapat diperbarui.',
+    );
+  }
 }
 
 export async function signOutCurrentUser(): Promise<void> {

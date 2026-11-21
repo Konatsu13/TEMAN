@@ -5,6 +5,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { useNotifications } from '../../hooks/useNotifications';
 import { useOnlineStatus } from '../../hooks/useOnlineStatus';
 import { getInitials } from '../../utils/formatters';
+import { getProfileColorText, isValidProfileColor } from '../../utils/profileColor';
 import { BrandLogo } from '../shared/BrandLogo';
 import { Badge } from '../ui/Badge';
 import { ThemeToggle } from '../ui/ThemeToggle';
@@ -77,7 +78,7 @@ export function TopHeader() {
   const isOwner = role === 'owner';
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between gap-4 border-b border-slate-200/90 bg-white/95 px-4 backdrop-blur-md lg:h-16 lg:px-8 dark:border-slate-800/90 dark:bg-slate-950/90">
+    <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between gap-4 border-b border-[var(--surface-border)] bg-[var(--surface-bg)]/95 px-4 backdrop-blur-md lg:h-16 lg:px-8">
       {/* Left: Brand (Mobile) & Context Title */}
       <div className="flex min-w-0 items-center gap-3">
         <div className="lg:hidden">
@@ -151,7 +152,7 @@ export function TopHeader() {
                 setSearchOpen(true);
               }}
               placeholder="Cari menu workspace..."
-              className="h-9 w-60 rounded-lg border border-slate-200/90 bg-slate-50/80 pl-9 pr-12 text-xs text-slate-900 placeholder:text-slate-400 transition-all focus:w-72 focus:border-blue-600 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/15 dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-blue-500 dark:focus:bg-slate-900 dark:focus:ring-blue-500/20"
+              className="h-9 w-60 rounded-lg border border-slate-200/90 bg-slate-50/80 pl-9 pr-12 text-xs text-slate-900 placeholder:text-slate-400 transition-all focus:w-72 focus:border-[var(--primary)] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/15 dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-[var(--primary)] dark:focus:bg-slate-900 dark:focus:ring-[var(--primary)]/20"
             />
             <kbd className="pointer-events-none absolute right-2.5 hidden rounded border border-slate-200 bg-white px-1.5 py-0.5 font-mono text-[10px] text-slate-400 sm:inline-block dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400">
               ⌘K
@@ -182,7 +183,7 @@ export function TopHeader() {
                         }}
                         className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-xs transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
                       >
-                        <Icon className="h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400" />
+                        <Icon className="h-4 w-4 shrink-0 text-[var(--primary)]" />
                         <div className="min-w-0 flex-1">
                           <div className="font-medium text-slate-900 dark:text-slate-100">
                             {item.label}
@@ -229,7 +230,19 @@ export function TopHeader() {
             onClick={() => setProfileMenuOpen((prev) => !prev)}
             aria-expanded={profileMenuOpen}
             aria-label="Menu akun"
-            className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 font-display text-xs font-bold text-white shadow-2xs"
+            className="flex h-9 w-9 items-center justify-center rounded-lg font-display text-xs font-bold text-white shadow-2xs"
+            style={
+              profile?.profile_background_color &&
+              isValidProfileColor(profile.profile_background_color)
+                ? {
+                    backgroundColor: profile.profile_background_color,
+                    color: getProfileColorText(profile.profile_background_color),
+                  }
+                : {
+                    backgroundColor: 'var(--primary)',
+                    color: 'var(--primary-contrast)',
+                  }
+            }
           >
             {getInitials(profile?.full_name)}
           </button>
@@ -321,7 +334,7 @@ export function TopHeader() {
                     }}
                     className="flex w-full items-center gap-3 rounded-xl p-2.5 text-left hover:bg-slate-100 dark:hover:bg-slate-800"
                   >
-                    <Icon className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                    <Icon className="h-4 w-4 text-[var(--primary)]" />
                     <div className="min-w-0 flex-1">
                       <div className="text-xs font-medium text-slate-900 dark:text-slate-100">
                         {item.label}

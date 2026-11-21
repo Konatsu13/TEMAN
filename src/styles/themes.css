@@ -1,0 +1,429 @@
+/* TEMAN Theme Presets — Single Source of Truth for all preset color values.
+ *
+ * Edit the HEX values below to change a preset. Components consume these via
+ * CSS custom properties and the semantic utility classes in src/index.css.
+ *
+ * Selectors:
+ *   :root / :root[data-theme-preset="..."]            -> Light mode
+ *   :root.dark / :root.dark[data-theme-preset="..."]   -> Dark mode
+ *
+ * Token roles: canvas is the page background; surface/elevated/hover are
+ * layered UI backgrounds; border tokens outline surfaces; text-main/sub/mute
+ * define text hierarchy; primary/primary-soft are interactive accents;
+ * primary-contrast is readable text on primary; entity-name identifies names;
+ * success/warning/danger/info are semantic states; focus-ring and
+ * scrollbar-thumb style keyboard focus and scrolling.
+ */
+
+/* ------------------------------------------------------------------ */
+/* TEMAN Default — Cobalt Blue + Slate                                  */
+/* ------------------------------------------------------------------ */
+:root,
+:root[data-theme-preset="teman"],
+.theme-preset-preview[data-theme-preset="teman"] {
+  --canvas-bg: #f8fafc;
+  --surface-bg: #ffffff;
+  --surface-elevated: #f1f5f9;
+  --surface-hover: #e2e8f0;
+  --surface-border: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --text-main: #0f172a;
+  --text-sub: #475569;
+  --text-mute: #94a3b8;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --primary-soft: #dbeafe;
+  --primary-contrast: #ffffff;
+  --entity-name: #315a86;
+  --success: #16a34a;
+  --warning: #d97706;
+  --danger: #dc2626;
+  --info: #0284c7;
+  --focus-ring: #2563eb;
+  --scrollbar-thumb: rgba(148, 163, 184, 0.4);
+  color-scheme: light;
+}
+
+:root.dark,
+:root.dark[data-theme-preset="teman"],
+.dark .theme-preset-preview[data-theme-preset="teman"] {
+  --canvas-bg: #090d16;
+  --surface-bg: #0f172a;
+  --surface-elevated: #1e293b;
+  --surface-hover: #334155;
+  --surface-border: #1e293b;
+  --border-strong: #334155;
+  --text-main: #f8fafc;
+  --text-sub: #94a3b8;
+  --text-mute: #64748b;
+  --primary: #3b82f6;
+  --primary-hover: #60a5fa;
+  --primary-soft: #1e3a8a;
+  --primary-contrast: #0f172a;
+  --entity-name: #8fb4dd;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #38bdf8;
+  --focus-ring: #60a5fa;
+  --scrollbar-thumb: rgba(71, 85, 105, 0.8);
+  color-scheme: dark;
+}
+
+/* ------------------------------------------------------------------ */
+/* Tokyo Night — Dark navy / indigo, accents blue/cyan/purple          */
+/* ------------------------------------------------------------------ */
+:root[data-theme-preset="tokyo-night"],
+.theme-preset-preview[data-theme-preset="tokyo-night"] {
+  --canvas-bg: #e6e9ef;
+  --surface-bg: #ffffff;
+  --surface-elevated: #dce1ea;
+  --surface-hover: #cfd6e2;
+  --surface-border: #cfd6e2;
+  --border-strong: #b4bfd1;
+  --text-main: #343b58;
+  --text-sub: #565f89;
+  --text-mute: #9aa5ce;
+  --primary: #2e7de9;
+  --primary-hover: #2667c7;
+  --primary-soft: #d7e2f5;
+  --primary-contrast: #ffffff;
+  --entity-name: #34548a;
+  --success: #16a34a;
+  --warning: #d97706;
+  --danger: #dc2626;
+  --info: #0284c7;
+  --focus-ring: #2e7de9;
+  --scrollbar-thumb: rgba(86, 95, 137, 0.35);
+  color-scheme: light;
+}
+
+:root.dark[data-theme-preset="tokyo-night"],
+.dark .theme-preset-preview[data-theme-preset="tokyo-night"] {
+  --canvas-bg: #1a1b26;
+  --surface-bg: #24283b;
+  --surface-elevated: #2f334d;
+  --surface-hover: #3b4261;
+  --surface-border: #2f334d;
+  --border-strong: #414868;
+  --text-main: #c0caf5;
+  --text-sub: #a9b1d6;
+  --text-mute: #565f89;
+  --primary: #7aa2f7;
+  --primary-hover: #89b4fa;
+  --primary-soft: #283457;
+  --primary-contrast: #1a1b26;
+  --entity-name: #8fb4dd;
+  --success: #9ece6a;
+  --warning: #e0af68;
+  --danger: #f7768e;
+  --info: #7dcfff;
+  --focus-ring: #7aa2f7;
+  --scrollbar-thumb: rgba(86, 95, 137, 0.6);
+  color-scheme: dark;
+}
+
+/* ------------------------------------------------------------------ */
+/* Codex — Neutral graphite, accents teal + blue                       */
+/* ------------------------------------------------------------------ */
+:root[data-theme-preset="codex"],
+.theme-preset-preview[data-theme-preset="codex"] {
+  --canvas-bg: #f4f6f8;
+  --surface-bg: #ffffff;
+  --surface-elevated: #edf0f3;
+  --surface-hover: #e3e7ec;
+  --surface-border: #e3e7ec;
+  --border-strong: #c9d1d9;
+  --text-main: #1f2328;
+  --text-sub: #57606a;
+  --text-mute: #8c959f;
+  --primary: #0d9488;
+  --primary-hover: #0b7f75;
+  --primary-soft: #ccfbf1;
+  --primary-contrast: #0f172a;
+  --entity-name: #1f6f6b;
+  --success: #16a34a;
+  --warning: #d97706;
+  --danger: #dc2626;
+  --info: #0284c7;
+  --focus-ring: #0d9488;
+  --scrollbar-thumb: rgba(87, 96, 106, 0.35);
+  color-scheme: light;
+}
+
+:root.dark[data-theme-preset="codex"],
+.dark .theme-preset-preview[data-theme-preset="codex"] {
+  --canvas-bg: #0d1117;
+  --surface-bg: #161b22;
+  --surface-elevated: #21262d;
+  --surface-hover: #30363d;
+  --surface-border: #21262d;
+  --border-strong: #30363d;
+  --text-main: #e6edf3;
+  --text-sub: #8b949e;
+  --text-mute: #6e7681;
+  --primary: #2dd4bf;
+  --primary-hover: #5eead4;
+  --primary-soft: #134e4a;
+  --primary-contrast: #0d1117;
+  --entity-name: #5eead4;
+  --success: #3fb950;
+  --warning: #d29922;
+  --danger: #f85149;
+  --info: #58a6ff;
+  --focus-ring: #2dd4bf;
+  --scrollbar-thumb: rgba(110, 118, 129, 0.6);
+  color-scheme: dark;
+}
+
+/* ------------------------------------------------------------------ */
+/* Linear — Graphite + neutral surface, accent violet/blue             */
+/* ------------------------------------------------------------------ */
+:root[data-theme-preset="linear"],
+.theme-preset-preview[data-theme-preset="linear"] {
+  --canvas-bg: #f7f8fa;
+  --surface-bg: #ffffff;
+  --surface-elevated: #f0f1f4;
+  --surface-hover: #e6e8ec;
+  --surface-border: #e6e8ec;
+  --border-strong: #d0d3d9;
+  --text-main: #0f1115;
+  --text-sub: #6b6f76;
+  --text-mute: #a1a5ad;
+  --primary: #5e6ad2;
+  --primary-hover: #4f5ac9;
+  --primary-soft: #e8eaf6;
+  --primary-contrast: #ffffff;
+  --entity-name: #5e6ad2;
+  --success: #16a34a;
+  --warning: #d97706;
+  --danger: #dc2626;
+  --info: #0284c7;
+  --focus-ring: #5e6ad2;
+  --scrollbar-thumb: rgba(107, 111, 118, 0.35);
+  color-scheme: light;
+}
+
+:root.dark[data-theme-preset="linear"],
+.dark .theme-preset-preview[data-theme-preset="linear"] {
+  --canvas-bg: #0f1014;
+  --surface-bg: #16171c;
+  --surface-elevated: #1f2025;
+  --surface-hover: #2a2b32;
+  --surface-border: #1f2025;
+  --border-strong: #2a2b32;
+  --text-main: #f7f8fa;
+  --text-sub: #9b9ca3;
+  --text-mute: #6b6f76;
+  --primary: #8a8ff0;
+  --primary-hover: #9fa3f3;
+  --primary-soft: #2a2d4a;
+  --primary-contrast: #0f1014;
+  --entity-name: #8a8ff0;
+  --success: #3fb950;
+  --warning: #d29922;
+  --danger: #f85149;
+  --info: #58a6ff;
+  --focus-ring: #8a8ff0;
+  --scrollbar-thumb: rgba(107, 111, 118, 0.6);
+  color-scheme: dark;
+}
+
+/* ------------------------------------------------------------------ */
+/* GitHub — Neutral surface, accent blue                               */
+/* ------------------------------------------------------------------ */
+:root[data-theme-preset="github"],
+.theme-preset-preview[data-theme-preset="github"] {
+  --canvas-bg: #f6f8fa;
+  --surface-bg: #ffffff;
+  --surface-elevated: #f0f2f5;
+  --surface-hover: #eaeef2;
+  --surface-border: #d0d7de;
+  --border-strong: #afb8c1;
+  --text-main: #1f2328;
+  --text-sub: #57606a;
+  --text-mute: #8c959f;
+  --primary: #0969da;
+  --primary-hover: #0550ae;
+  --primary-soft: #ddf4ff;
+  --primary-contrast: #ffffff;
+  --entity-name: #0969da;
+  --success: #1a7f37;
+  --warning: #9a6700;
+  --danger: #cf222e;
+  --info: #0969da;
+  --focus-ring: #0969da;
+  --scrollbar-thumb: rgba(87, 96, 106, 0.35);
+  color-scheme: light;
+}
+
+:root.dark[data-theme-preset="github"],
+.dark .theme-preset-preview[data-theme-preset="github"] {
+  --canvas-bg: #0d1117;
+  --surface-bg: #161b22;
+  --surface-elevated: #21262d;
+  --surface-hover: #30363d;
+  --surface-border: #30363d;
+  --border-strong: #484f58;
+  --text-main: #e6edf3;
+  --text-sub: #8b949e;
+  --text-mute: #6e7681;
+  --primary: #2f81f7;
+  --primary-hover: #58a6ff;
+  --primary-soft: #1f3b5b;
+  --primary-contrast: #0d1117;
+  --entity-name: #58a6ff;
+  --success: #3fb950;
+  --warning: #d29922;
+  --danger: #f85149;
+  --info: #58a6ff;
+  --focus-ring: #2f81f7;
+  --scrollbar-thumb: rgba(110, 118, 129, 0.6);
+  color-scheme: dark;
+}
+
+/* ------------------------------------------------------------------ */
+/* Nord — Cool slate / arctic blue                                      */
+/* ------------------------------------------------------------------ */
+:root[data-theme-preset="nord"],
+.theme-preset-preview[data-theme-preset="nord"] {
+  --canvas-bg: #eceff4;
+  --surface-bg: #ffffff;
+  --surface-elevated: #e5e9f0;
+  --surface-hover: #d8dee9;
+  --surface-border: #d8dee9;
+  --border-strong: #bfc7d5;
+  --text-main: #2e3440;
+  --text-sub: #4c566a;
+  --text-mute: #8190a5;
+  --primary: #5e81ac;
+  --primary-hover: #4f739a;
+  --primary-soft: #e5e9f0;
+  --primary-contrast: #0f172a;
+  --entity-name: #5e81ac;
+  --success: #16a34a;
+  --warning: #d97706;
+  --danger: #dc2626;
+  --info: #0284c7;
+  --focus-ring: #5e81ac;
+  --scrollbar-thumb: rgba(76, 86, 106, 0.35);
+  color-scheme: light;
+}
+
+:root.dark[data-theme-preset="nord"],
+.dark .theme-preset-preview[data-theme-preset="nord"] {
+  --canvas-bg: #2e3440;
+  --surface-bg: #3b4252;
+  --surface-elevated: #434c5e;
+  --surface-hover: #4c566a;
+  --surface-border: #434c5e;
+  --border-strong: #4c566a;
+  --text-main: #eceff4;
+  --text-sub: #d8dee9;
+  --text-mute: #8190a5;
+  --primary: #88c0d0;
+  --primary-hover: #8fbcbb;
+  --primary-soft: #3b4d5f;
+  --primary-contrast: #2e3440;
+  --entity-name: #88c0d0;
+  --success: #a3be8c;
+  --warning: #ebcb8b;
+  --danger: #bf616a;
+  --info: #81a1c1;
+  --focus-ring: #88c0d0;
+  --scrollbar-thumb: rgba(129, 144, 165, 0.6);
+  color-scheme: dark;
+}
+
+/* ------------------------------------------------------------------ */
+/* Dracula — Dark purple-gray, accents purple/pink/cyan                */
+/* ------------------------------------------------------------------ */
+:root[data-theme-preset="dracula"],
+.theme-preset-preview[data-theme-preset="dracula"] {
+  --canvas-bg: #f5f3fa;
+  --surface-bg: #ffffff;
+  --surface-elevated: #ece9f6;
+  --surface-hover: #e2ddf2;
+  --surface-border: #e2ddf2;
+  --border-strong: #c9c2e0;
+  --text-main: #282a36;
+  --text-sub: #4d4f68;
+  --text-mute: #9a9bb5;
+  --primary: #7c3aed;
+  --primary-hover: #6d28d9;
+  --primary-soft: #ede9fe;
+  --primary-contrast: #ffffff;
+  --entity-name: #7c3aed;
+  --success: #16a34a;
+  --warning: #d97706;
+  --danger: #dc2626;
+  --info: #0284c7;
+  --focus-ring: #7c3aed;
+  --scrollbar-thumb: rgba(77, 79, 104, 0.35);
+  color-scheme: light;
+}
+
+:root.dark[data-theme-preset="dracula"],
+.dark .theme-preset-preview[data-theme-preset="dracula"] {
+  --canvas-bg: #282a36;
+  --surface-bg: #343746;
+  --surface-elevated: #44475a;
+  --surface-hover: #4f5368;
+  --surface-border: #44475a;
+  --border-strong: #6272a4;
+  --text-main: #f8f8f2;
+  --text-sub: #cfcfd8;
+  --text-mute: #6272a4;
+  --primary: #bd93f9;
+  --primary-hover: #caa9fa;
+  --primary-soft: #3a3252;
+  --primary-contrast: #282a36;
+  --entity-name: #bd93f9;
+  --success: #50fa7b;
+  --warning: #f1fa8c;
+  --danger: #ff5555;
+  --info: #8be9fd;
+  --focus-ring: #bd93f9;
+  --scrollbar-thumb: rgba(98, 114, 164, 0.6);
+  color-scheme: dark;
+}
+
+/* Compatibility aliases let existing Tailwind slate/blue utilities use theme tokens. */
+:root {
+  --palette-slate-50: var(--canvas-bg);
+  --palette-slate-100: var(--surface-elevated);
+  --palette-slate-200: var(--surface-border);
+  --palette-slate-300: var(--border-strong);
+  --palette-slate-400: var(--text-mute);
+  --palette-slate-500: var(--text-sub);
+  --palette-slate-600: var(--text-sub);
+  --palette-slate-700: var(--text-main);
+  --palette-slate-800: var(--text-main);
+  --palette-slate-900: var(--text-main);
+  --palette-slate-950: var(--text-main);
+  --palette-blue-50: var(--primary-soft);
+  --palette-blue-100: var(--primary-soft);
+  --palette-blue-200: var(--primary-soft);
+  --palette-blue-300: var(--primary);
+  --palette-blue-400: var(--primary);
+  --palette-blue-500: var(--primary);
+  --palette-blue-600: var(--primary);
+  --palette-blue-700: var(--primary-hover);
+  --palette-blue-800: var(--primary-soft);
+  --palette-blue-900: var(--primary-soft);
+  --palette-blue-950: var(--primary-soft);
+}
+
+:root.dark {
+  --palette-slate-50: var(--text-main);
+  --palette-slate-100: var(--text-main);
+  --palette-slate-200: var(--text-sub);
+  --palette-slate-300: var(--text-sub);
+  --palette-slate-400: var(--text-sub);
+  --palette-slate-500: var(--text-mute);
+  --palette-slate-600: var(--surface-hover);
+  --palette-slate-700: var(--border-strong);
+  --palette-slate-800: var(--surface-elevated);
+  --palette-slate-900: var(--surface-bg);
+  --palette-slate-950: var(--canvas-bg);
+}

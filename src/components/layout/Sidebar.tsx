@@ -3,11 +3,12 @@ import { LogOut } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useNotifications } from '../../hooks/useNotifications';
 import { getInitials } from '../../utils/formatters';
+import { getProfileColorText, isValidProfileColor } from '../../utils/profileColor';
 import { BrandLogo } from '../shared/BrandLogo';
 import { Badge } from '../ui/Badge';
 import { WORKSPACE_NAV_ITEMS } from './navigation';
 
-const PRIMARY_IDS = new Set(['overview', 'competitions', 'tasks', 'calendar']);
+const PRIMARY_IDS = new Set(['overview', 'chat', 'competitions', 'tasks', 'calendar']);
 
 export function Sidebar() {
   const { profile, role, signOut } = useAuth();
@@ -28,9 +29,9 @@ export function Sidebar() {
         key={item.id}
         to={item.to}
         className={({ isActive }) =>
-          `group relative flex h-9 items-center gap-2.5 rounded-lg px-3 text-sm font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 select-none ${
+          `group relative flex h-9 items-center gap-2.5 rounded-lg px-3 text-sm font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] select-none ${
             isActive
-              ? 'bg-blue-50 text-blue-700 font-semibold shadow-2xs dark:bg-blue-950/60 dark:text-blue-300'
+              ? 'bg-[var(--primary-soft)] text-[var(--primary)] font-semibold shadow-2xs'
               : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/70 dark:hover:text-slate-200'
           }`
         }
@@ -39,14 +40,14 @@ export function Sidebar() {
           <>
             {isActive && (
               <span
-                className="absolute inset-y-1.5 left-0 w-1 rounded-r-full bg-blue-600 dark:bg-blue-400"
+                className="absolute inset-y-1.5 left-0 w-1 rounded-r-full bg-[var(--primary)]"
                 aria-hidden="true"
               />
             )}
             <Icon
               className={`h-4 w-4 shrink-0 transition-colors ${
                 isActive
-                  ? 'text-blue-600 dark:text-blue-400'
+                  ? 'text-[var(--primary)]'
                   : 'text-slate-400 group-hover:text-slate-600 dark:text-slate-500 dark:group-hover:text-slate-300'
               }`}
               aria-hidden="true"
@@ -66,7 +67,7 @@ export function Sidebar() {
   return (
     <aside
       aria-label="Navigasi utama workspace"
-      className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r border-slate-200/90 bg-slate-50/70 backdrop-blur-xs lg:flex dark:border-slate-800/90 dark:bg-slate-950/80"
+      className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r border-[var(--surface-border)] bg-[var(--canvas-bg)]/70 backdrop-blur-xs lg:flex"
     >
       {/* Brand Header */}
       <div className="flex h-16 items-center border-b border-slate-200/90 px-5 dark:border-slate-800/90">
@@ -95,7 +96,19 @@ export function Sidebar() {
         <div className="flex items-center gap-2.5 rounded-xl border border-slate-200/60 bg-white p-2 shadow-2xs dark:border-slate-800/80 dark:bg-slate-900/60">
           <div
             aria-hidden="true"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-600 font-display text-xs font-bold text-white shadow-2xs"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg font-display text-xs font-bold text-white shadow-2xs"
+            style={
+              profile?.profile_background_color &&
+              isValidProfileColor(profile.profile_background_color)
+                ? {
+                    backgroundColor: profile.profile_background_color,
+                    color: getProfileColorText(profile.profile_background_color),
+                  }
+                : {
+                    backgroundColor: 'var(--primary)',
+                    color: 'var(--primary-contrast)',
+                  }
+            }
           >
             {getInitials(profile?.full_name)}
           </div>

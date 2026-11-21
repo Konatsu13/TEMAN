@@ -107,7 +107,7 @@ Menggunakan keluarga font yang telah teruji keterbacaannya dan sudah terpasang d
 ### 5.1 Desktop Layout (`>= 1024px`)
 - **Fixed Left Sidebar (256px / `w-64`):**
   - Brand header dengan logo TEMAN dan wordmark resmi.
-  - Seksi 1: **Workspace** (`Overview`, `Competitions`, `My Tasks`, `Calendar`).
+  - Seksi 1: **Workspace** (`Overview`, `Global Chat`, `Competitions`, `My Tasks`, `Calendar`).
   - Seksi 2: **Tim & Tata Kelola** (`Members`, `Notifications`, `Settings`).
   - Footer pengguna: Avatar inisial, nama lengkap, role badge (`Owner` / `Member`), dan shortcut logout.
 - **Top Sticky Header (`h-14` / `h-16`):**
@@ -122,7 +122,7 @@ Menggunakan keluarga font yang telah teruji keterbacaannya dan sudah terpasang d
 - **Top Mobile Bar (`h-14`):** Brand logo + nama halaman + Theme toggle + avatar.
 - **Bottom Navigation Bar (`h-16`):**
   - 4 Menu Utama: `Overview`, `Kompetisi`, `Tugas`, `Kalender`.
-  - 1 Action Sheet Trigger: `Lainnya` (Membuka drawer bottom-sheet berisi `Anggota`, `Notifikasi`, `Pengaturan`, dan `Keluar`).
+  - 1 Action Sheet Trigger: `Lainnya` (Membuka drawer bottom-sheet berisi `Global Chat`, `Anggota`, `Notifikasi`, `Pengaturan`, dan `Keluar`).
   - Memperhitungkan iOS safe area (`pb-[env(safe-area-inset-bottom)]`).
   - Minimum touch target: `44px × 44px`.
 
@@ -240,6 +240,21 @@ Menggunakan keluarga font yang telah teruji keterbacaannya dan sudah terpasang d
   - Profil Pengguna (Nama lengkap, username, role, tanggal pembuatan akun).
   - Preferensi Tema (Sistem, Terang, Gelap) dengan visual preview kartu.
   - Sesi Akun & Logout dengan konfirmasi.
+
+### 7.9 Global Chat (`/chat`)
+- **Tujuan:** Satu kanal diskusi publik untuk seluruh anggota aktif, dengan mention anggota dan bantuan TEMAN AI.
+- **Komposisi Layout:**
+  - **Channel Header:** Nama kanal, badge `Publik tim`, jumlah anggota online (jika presence tersedia), penanda `AI mention`, aksi muat ulang, dan tombol info pada layar kecil.
+  - **Message Surface:** Baris pesan yang dikelompokkan per hari WIB; pesan berurutan dari penulis yang sama dalam 5 menit ditampilkan kompak. Mention `@username` dan `@ai` diberi penekanan visual; tautan eksternal aman (`noopener noreferrer`).
+  - **AI Reply:** Blok editorial dengan aksen border kiri biru, label `TEMAN AI`, status menulis, dan aksi coba lagi bila gagal. AI hanya dipicu oleh penulis pesan yang menyebut `@ai` atau `@teman`.
+  - **Composer:** Textarea auto-grow, `Enter` mengirim, `Shift+Enter` baris baru, autocomplete mention dengan navigasi keyboard, tombol `Mention`, dan tombol `Tanya AI`.
+  - **Info Aside (desktop `xl`):** Ringkasan kanal, statistik pesan/anggota/online, penjelasan AI, direktori anggota, dan panduan singkat. Pada layar kecil, konten yang sama dibuka dalam modal.
+- **State & Batasan:**
+  - Pesan dimuat maksimal 150 pesan terbaru; Realtime menangani INSERT/UPDATE/DELETE dengan polling fallback 30 detik saat tab terlihat.
+  - Pesan sendiri dapat diedit (maksimal 2000 karakter, label `diedit`); penulis dan Owner dapat menghapus dengan konfirmasi.
+  - Pesan AI tidak dapat diedit; menghapus pesan induk ikut menghapus balasan AI melalui cascade.
+  - AI memakai Edge Function `chat-ai` dan Gemini server-side; pertanyaan analitik diteruskan ke query baca-terbatas `ai-query`, bukan mengeksekusi SQL yang dihasilkan model. Kunci API tidak pernah masuk bundle browser.
+  - Jika tabel, policy, atau Edge Function belum disiapkan, UI menampilkan instruksi yang jelas tanpa mengklaim fitur sudah aktif.
 
 ---
 

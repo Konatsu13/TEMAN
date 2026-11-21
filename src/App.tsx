@@ -6,6 +6,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { LoginPage } from './pages/auth/LoginPage';
 import { CalendarPage } from './pages/calendar/CalendarPage';
+import { GlobalChatPage } from './pages/chat/GlobalChatPage';
 import { CompetitionDetailPage } from './pages/competitions/CompetitionDetailPage';
 import { CompetitionsPage } from './pages/competitions/CompetitionsPage';
 import { OverviewPage } from './pages/dashboard/OverviewPage';
@@ -41,8 +42,8 @@ export default function App() {
   }, []);
 
   return (
-    <ThemeProvider>
-      <AuthProvider>
+    <AuthProvider>
+      <ThemeProvider>
         <BrowserRouter>
           {showSplash && <SplashScreen onComplete={handleSplashComplete} />}
 
@@ -51,6 +52,7 @@ export default function App() {
 
             <Route element={<ProtectedRoute />}>
               <Route path="/overview" element={<OverviewPage />} />
+              <Route path="/chat" element={<GlobalChatPage />} />
               <Route path="/competitions" element={<CompetitionsPage />} />
               <Route path="/competitions/:id" element={<CompetitionDetailPage />} />
               <Route path="/tasks" element={<MyTasksPage />} />
@@ -64,7 +66,7 @@ export default function App() {
             <Route path="*" element={<Navigate to="/overview" replace />} />
           </Routes>
         </BrowserRouter>
-      </AuthProvider>
-    </ThemeProvider>
+      </ThemeProvider>
+    </AuthProvider>
   );
 }

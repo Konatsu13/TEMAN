@@ -4,6 +4,7 @@ export interface AIQueryResult {
   answer: string;
   columns: string[];
   rows: Array<Record<string, AIQueryCell>>;
+  supported?: boolean;
 }
 
 export function isAIQueryResult(value: unknown): value is AIQueryResult {
@@ -11,6 +12,7 @@ export function isAIQueryResult(value: unknown): value is AIQueryResult {
   const result = value as Record<string, unknown>;
   if (
     typeof result.answer !== 'string' ||
+    (result.supported !== undefined && typeof result.supported !== 'boolean') ||
     !Array.isArray(result.columns) ||
     !Array.isArray(result.rows) ||
     !result.columns.every((column) => typeof column === 'string')

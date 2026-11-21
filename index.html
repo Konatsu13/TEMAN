@@ -21,7 +21,7 @@
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/logo-app.png" />
     <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#F8FAFC" />
+    <meta name="theme-color" content="" />
     <meta name="color-scheme" content="light dark" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -42,15 +42,28 @@
           } else {
             document.documentElement.classList.remove('dark');
           }
-          var themeColor = document.querySelector('meta[name="theme-color"]');
-          if (themeColor) {
-            themeColor.content = isDark ? '#0F172A' : '#F8FAFC';
-          }
+          try {
+            var savedPreset = localStorage.getItem('teman_theme_preset');
+            var validPresets = [
+              'teman',
+              'tokyo-night',
+              'codex',
+              'linear',
+              'github',
+              'nord',
+              'dracula'
+            ];
+            if (validPresets.indexOf(savedPreset) !== -1) {
+              document.documentElement.setAttribute('data-theme-preset', savedPreset);
+            } else {
+              document.documentElement.setAttribute('data-theme-preset', 'teman');
+            }
+          } catch (e) {}
         } catch (e) {}
       })();
     </script>
   </head>
-  <body class="bg-slate-50 text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100">
+  <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

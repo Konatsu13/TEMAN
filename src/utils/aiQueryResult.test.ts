@@ -24,4 +24,20 @@ test('AI query response rejects invalid cells and malformed payloads', () => {
   );
   assert.equal(isAIQueryResult({ answer: 'Jawaban', columns: [], rows: [null] }), false);
   assert.equal(isAIQueryResult(null), false);
+  assert.equal(
+    isAIQueryResult({ answer: 'Jawaban', columns: [], rows: [], supported: 'yes' }),
+    false
+  );
+});
+
+test('AI query response accepts support metadata for chat routing', () => {
+  assert.equal(
+    isAIQueryResult({
+      answer: 'Saya belum menemukan analitik yang cocok.',
+      columns: [],
+      rows: [],
+      supported: false,
+    }),
+    true
+  );
 });

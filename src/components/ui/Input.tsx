@@ -41,8 +41,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             htmlFor={inputId}
             className={`block text-sm font-medium ${
               disabled
-                ? 'text-slate-400 dark:text-slate-600'
-                : 'text-slate-700 dark:text-slate-300'
+                ? 'text-[var(--text-mute)]'
+                : 'text-[var(--text-sub)]'
             }`}
           >
             {label}
@@ -50,7 +50,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         )}
         <div className="relative flex items-center">
           {leftIcon && (
-            <div className="pointer-events-none absolute left-3 flex items-center text-slate-400 dark:text-slate-500">
+            <div className="pointer-events-none absolute left-3 flex items-center text-[var(--text-mute)]">
               {leftIcon}
             </div>
           )}
@@ -60,12 +60,12 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             disabled={disabled}
             aria-invalid={Boolean(error)}
             aria-describedby={error ? errorId : hint ? hintId : undefined}
-            className={`h-9 w-full rounded-lg border bg-white text-sm text-slate-900 placeholder:text-slate-400 transition-colors duration-150 focus:outline-none focus:ring-2 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500 dark:disabled:bg-slate-900/40 dark:disabled:text-slate-600 ${
+            className={`h-9 w-full rounded-lg border bg-[var(--surface-bg)] text-sm text-[var(--text-main)] placeholder:text-[var(--text-mute)] transition-colors duration-150 focus:outline-none focus:ring-2 disabled:cursor-not-allowed disabled:bg-[var(--surface-elevated)] disabled:text-[var(--text-mute)] ${
               leftIcon ? 'pl-9' : 'pl-3'
             } ${rightElement ? 'pr-11' : 'pr-3'} ${
               error
-                ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 dark:border-rose-600 dark:focus:border-rose-500'
-                : 'border-slate-200 focus:border-blue-600 focus:ring-blue-600/15 dark:border-slate-700 dark:focus:border-blue-500 dark:focus:ring-blue-500/20'
+                ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]/20'
+                : 'border-[var(--surface-border)] focus:border-[var(--primary)] focus:ring-[var(--primary)]/15'
             } ${className}`}
             {...props}
           />
@@ -79,7 +79,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           <p
             id={errorId}
             role="alert"
-            className="flex items-center gap-1.5 text-xs text-rose-600 dark:text-rose-400"
+            className="app-danger flex items-center gap-1.5 text-xs"
           >
             <AlertCircle className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
             <span>{error}</span>

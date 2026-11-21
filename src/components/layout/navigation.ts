@@ -3,6 +3,7 @@ import {
   CalendarDays,
   CheckSquare,
   LayoutDashboard,
+  MessagesSquare,
   Settings,
   Trophy,
   Users,
@@ -26,6 +27,13 @@ export const WORKSPACE_NAV_ITEMS: NavItem[] = [
     to: '/overview',
     icon: LayoutDashboard,
     primaryMobile: true,
+  },
+  {
+    id: 'chat',
+    label: 'Global Chat',
+    description: 'Ruang diskusi publik tim dengan mention anggota dan bantuan TEMAN AI',
+    to: '/chat',
+    icon: MessagesSquare,
   },
   {
     id: 'competitions',

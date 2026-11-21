@@ -1,5 +1,6 @@
 // TEMAN Supabase database type reference.
 // Based on inspected public schema (project ref: xibgmucfyfvxllnajutg).
+import type { ThemePresetId } from '../config/theme-presets';
 
 export type Json =
   | string
@@ -35,6 +36,8 @@ export interface Database {
           username: string;
           full_name: string;
           is_active: boolean;
+          theme_preset: ThemePresetId;
+          profile_background_color: string | null;
           created_at: Timestamp;
           updated_at: Timestamp;
         };
@@ -43,6 +46,8 @@ export interface Database {
           username: string;
           full_name: string;
           is_active?: boolean;
+          theme_preset?: ThemePresetId;
+          profile_background_color?: string | null;
           created_at?: Timestamp;
           updated_at?: Timestamp;
         };
@@ -51,6 +56,8 @@ export interface Database {
           username?: string;
           full_name?: string;
           is_active?: boolean;
+          theme_preset?: ThemePresetId;
+          profile_background_color?: string | null;
           created_at?: Timestamp;
           updated_at?: Timestamp;
         };
@@ -419,6 +426,36 @@ export interface Database {
         };
         Relationships: [];
       };
+      chat_messages: {
+        Row: {
+          id: UUID;
+          author_id: UUID | null;
+          content: string;
+          is_ai: boolean;
+          reply_to_id: UUID | null;
+          edited_at: Timestamp | null;
+          created_at: Timestamp;
+        };
+        Insert: {
+          id?: UUID;
+          author_id?: UUID | null;
+          content: string;
+          is_ai?: boolean;
+          reply_to_id?: UUID | null;
+          edited_at?: Timestamp | null;
+          created_at?: Timestamp;
+        };
+        Update: {
+          id?: UUID;
+          author_id?: UUID | null;
+          content?: string;
+          is_ai?: boolean;
+          reply_to_id?: UUID | null;
+          edited_at?: Timestamp | null;
+          created_at?: Timestamp;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -463,6 +500,14 @@ export interface Database {
       is_owner: {
         Args: { _user_id: UUID };
         Returns: boolean;
+      };
+      is_valid_chat_ai_reply: {
+        Args: { p_reply_to_id: UUID };
+        Returns: boolean;
+      };
+      notify_chat_mentions: {
+        Args: { p_message_id: UUID };
+        Returns: number;
       };
     };
     Enums: {

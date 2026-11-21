@@ -22,7 +22,8 @@ import { useNotifications } from '../../hooks/useNotifications';
 import {
   checkPushSubscriptionInDb,
   registerPushSubscription,
-  triggerLocalTestNotification,
+  playNotificationSound,
+  sendTestPushNotification,
   unregisterPushSubscription,
   type NotificationItem,
 } from '../../services/notificationService';
@@ -38,6 +39,35 @@ type TypeFilter = 'all' | 'mention' | 'assignment' | 'comment' | 'deadline';
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
+
+function getVapidApplicationServerKey(value: string): ArrayBuffer {
+  const base64 = value.replace(/-/g, '+').replace(/_/g, '/');
+  const normalized = base64.padEnd(Math.ceil(base64.length / 4) * 4, '=');
+  if (!/^[A-Za-z0-9+/]+={0,2}$/.test(normalized)) {
+    throw new Error('VITE_VAPID_PUBLIC_KEY bukan public key VAPID yang valid.');
+  }
+
+  const binary = window.atob(normalized);
+  if (binary.length !== 65) {
+    throw new Error('VITE_VAPID_PUBLIC_KEY harus berisi public key VAPID P-256.');
+  }
+  const buffer = new ArrayBuffer(binary.length);
+  const bytes = new Uint8Array(buffer);
+  for (let index = 0; index < binary.length; index += 1) {
+    bytes[index] = binary.charCodeAt(index);
+  }
+  return buffer;
+}
+
+function sameApplicationServerKey(
+  currentKey: ArrayBuffer | null,
+  expectedKey: ArrayBuffer
+): boolean {
+  if (!currentKey || currentKey.byteLength !== expectedKey.byteLength) return false;
+  const currentBytes = new Uint8Array(currentKey);
+  const expectedBytes = new Uint8Array(expectedKey);
+  return currentBytes.every((value, index) => value === expectedBytes[index]);
 }
 
 export function NotificationsPage() {
@@ -130,6 +160,14 @@ export function NotificationsPage() {
         setPushSubscribed(false);
         setPushFeedback('Notifikasi push berhasil dinonaktifkan di browser ini.');
       } else {
+        const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY?.trim();
+        if (!vapidPublicKey) {
+          throw new Error(
+            'Atur VITE_VAPID_PUBLIC_KEY sebelum mengaktifkan Web Push pada perangkat ini.'
+          );
+        }
+        const applicationServerKey = getVapidApplicationServerKey(vapidPublicKey);
+
         // Request permission
         const permission = await Notification.requestPermission();
         setPushPermission(permission);
@@ -143,23 +181,24 @@ export function NotificationsPage() {
         const reg = await navigator.serviceWorker.ready;
         let sub = await reg.pushManager.getSubscription();
 
+        if (sub && !sameApplicationServerKey(sub.options.applicationServerKey, applicationServerKey)) {
+          await sub.unsubscribe();
+          await unregisterPushSubscription(user.id, sub.endpoint);
+          sub = null;
+        }
+
         if (!sub) {
-          // Subscribe without VAPID if none configured, or with public key if available
-          try {
-            sub = await reg.pushManager.subscribe({
-              userVisibleOnly: true,
-            });
-          } catch {
-            // Some browsers require applicationServerKey; if not supplied, subscribe may fail,
-            // but local notifications still function flawlessly.
-          }
+          sub = await reg.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey,
+          });
         }
 
         if (sub) {
           await registerPushSubscription(user.id, sub);
           setPushSubscribed(true);
           setPushFeedback(
-            'Langganan browser tersimpan. Pengiriman Web Push tetap memerlukan layanan server-side.'
+            'Web Push aktif pada browser ini. Perangkat lain pada akun yang sama juga dapat menerima notifikasi.'
           );
         } else {
           setPushSubscribed(false);
@@ -176,19 +215,21 @@ export function NotificationsPage() {
     }
   };
 
-  // Test local notification
+  // Send a server-side push to every subscribed device on this account.
   const handleTestNotification = async () => {
     setPushLoading(true);
     setPushFeedback(null);
     try {
-      const ok = await triggerLocalTestNotification(
-        '🔔 Uji Coba Notifikasi TEMAN',
-        'Sistem notifikasi workspace dan Web Push Anda berfungsi sempurna!'
-      );
-      if (ok) {
-        setPushFeedback('Notifikasi uji coba berhasil dikirim ke perangkat Anda.');
+      const result = await sendTestPushNotification();
+      if (result.sent > 0) {
+        playNotificationSound();
+        setPushFeedback(
+          `Notifikasi uji coba dikirim ke ${result.sent} dari ${result.total} perangkat yang terdaftar.`
+        );
       } else {
-        setPushFeedback('Pastikan izin notifikasi di browser telah disetujui.');
+        setPushFeedback(
+          'Belum ada perangkat Web Push terdaftar. Aktifkan Web Push pada HP atau browser tujuan terlebih dahulu.'
+        );
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Gagal mengirim notifikasi';
@@ -234,6 +275,8 @@ export function NotificationsPage() {
       navigate(`/competitions/${item.competition_id}`);
     } else if (item.task_id) {
       navigate('/tasks');
+    } else if (item.type === 'mention') {
+      navigate('/chat');
     }
   };
 
@@ -361,7 +404,7 @@ export function NotificationsPage() {
                   )}
                 </div>
                 <p className="mt-0.5 text-xs text-slate-600 dark:text-slate-400">
-                  Dapatkan notifikasi langsung di layar komputer atau smartphone saat ada tugas baru atau deadline mendesak.
+                  Dapatkan notifikasi mention, deadline lomba/tugas, dan jadwal dekat di komputer atau smartphone.
                 </p>
               </div>
             </div>

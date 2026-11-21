@@ -64,6 +64,45 @@ export function formatDateTimeWIB(value: string | Date | null | undefined): stri
   return `${formatted.replace('.', ':')} WIB`;
 }
 
+export function formatTimeWIB(value: string | Date | null | undefined): string {
+  if (!value) return '—';
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return '—';
+
+  const formatted = new Intl.DateTimeFormat('id-ID', {
+    timeZone: WIB_TIMEZONE,
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(date);
+
+  return formatted.replace('.', ':');
+}
+
+function getWIBDateKey(value: Date): string {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: WIB_TIMEZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(value);
+}
+
+export function formatChatDayWIB(
+  value: string | Date | null | undefined,
+  now: Date = new Date()
+): string {
+  if (!value) return '—';
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return '—';
+
+  const key = getWIBDateKey(date);
+  if (key === getWIBDateKey(now)) return 'Hari ini';
+  if (key === getWIBDateKey(new Date(now.getTime() - 86_400_000))) return 'Kemarin';
+
+  return formatDateWIB(date);
+}
+
 export function formatCurrencyIDR(amount: number | null | undefined): string {
   const safeAmount = typeof amount === 'number' && Number.isFinite(amount) ? amount : 0;
   return new Intl.NumberFormat('id-ID', {
