@@ -245,8 +245,8 @@ Menggunakan keluarga font yang telah teruji keterbacaannya dan sudah terpasang d
 - **Tujuan:** Satu kanal diskusi publik untuk seluruh anggota aktif, dengan mention anggota dan bantuan TEMAN AI.
 - **Komposisi Layout:**
   - **Channel Header:** Nama kanal, badge `Publik tim`, jumlah anggota online (jika presence tersedia), penanda `AI mention`, aksi muat ulang, dan tombol info pada layar kecil.
-  - **Message Surface:** Baris pesan yang dikelompokkan per hari WIB; pesan berurutan dari penulis yang sama dalam 5 menit ditampilkan kompak. Mention `@username` dan `@ai` diberi penekanan visual; tautan eksternal aman (`noopener noreferrer`).
-  - **AI Reply:** Blok editorial dengan aksen border kiri biru, label `TEMAN AI`, status menulis, dan aksi coba lagi bila gagal. AI hanya dipicu oleh penulis pesan yang menyebut `@ai` atau `@teman`.
+  - **Message Surface:** Bubble chat yang dikelompokkan per hari WIB. Pesan sendiri rata kanan dengan bubble biru kobalt tanpa avatar; pesan anggota lain rata kiri dengan avatar dan bubble surface ber-border. Sudut dekat penulis dibuat lebih tajam (`rounded-tr-md` / `rounded-tl-md`) sebagai penanda arah. Pesan berurutan dari penulis yang sama dalam 5 menit ditampilkan kompak (header nama/waktu disembunyikan, jarak antar-bubble dirapatkan). Lebar bubble dibatasi ±72% pada desktop dan ±85% pada mobile agar baris tetap terbaca. Mention `@username` dan `@ai` diberi penekanan visual (chip putih transparan di dalam bubble sendiri); tautan eksternal aman (`noopener noreferrer`).
+  - **AI Reply:** Bubble biru lembut di sisi kiri dengan avatar sparkle, label `TEMAN AI`, status menulis, dan aksi coba lagi bila gagal. AI hanya dipicu oleh penulis pesan yang menyebut `@ai` atau `@teman`.
   - **Composer:** Textarea auto-grow, `Enter` mengirim, `Shift+Enter` baris baru, autocomplete mention dengan navigasi keyboard, tombol `Mention`, dan tombol `Tanya AI`.
   - **Info Aside (desktop `xl`):** Ringkasan kanal, statistik pesan/anggota/online, penjelasan AI, direktori anggota, dan panduan singkat. Pada layar kecil, konten yang sama dibuka dalam modal.
 - **State & Batasan:**

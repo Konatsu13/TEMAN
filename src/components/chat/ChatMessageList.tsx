@@ -56,19 +56,35 @@ function DayDivider({ label }: { label: string }) {
 function LoadingMessages() {
   return (
     <div
-      className="flex-1 space-y-1 px-4 py-4"
+      className="flex-1 space-y-4 px-4 py-4"
       aria-busy="true"
       aria-label="Memuat pesan"
     >
-      {[0, 1, 2, 3, 4].map((item) => (
-        <div key={item} className="flex gap-3 py-2.5">
-          <Skeleton className="h-8 w-8 shrink-0 rounded-lg" />
-          <div className="min-w-0 flex-1 space-y-2">
-            <Skeleton className="h-3 w-28" />
-            <Skeleton className={item % 2 === 0 ? 'h-4 w-3/4' : 'h-4 w-1/2'} />
+      {[0, 1, 2, 3, 4].map((item) => {
+        const isOwn = item % 2 === 1;
+        return (
+          <div
+            key={item}
+            className={`flex items-start gap-2.5 ${isOwn ? 'justify-end' : ''}`}
+          >
+            {!isOwn && <Skeleton className="h-8 w-8 shrink-0 rounded-lg" />}
+            <div
+              className={`flex flex-col gap-1.5 ${
+                isOwn ? 'items-end' : 'items-start'
+              }`}
+            >
+              <Skeleton className="h-2.5 w-24" />
+              <Skeleton
+                className={`h-11 rounded-2xl ${
+                  isOwn
+                    ? 'w-48 rounded-tr-md sm:w-56'
+                    : 'w-56 rounded-tl-md sm:w-72'
+                }`}
+              />
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -122,7 +138,7 @@ function PendingAI() {
     <div
       role="status"
       aria-live="polite"
-      className="flex items-start gap-3 border-l-2 border-blue-500 bg-blue-50/30 px-3 py-3 sm:px-4 dark:bg-blue-950/10"
+      className="mt-3 flex items-start gap-2.5 px-3 sm:px-4"
     >
       <div
         aria-hidden="true"
@@ -130,8 +146,8 @@ function PendingAI() {
       >
         <Sparkles className="h-4 w-4" />
       </div>
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2">
+      <div className="min-w-0 max-w-[85%] sm:max-w-[72%]">
+        <div className="mb-1 flex items-center gap-2 pl-1">
           <span className="font-display text-xs font-bold text-slate-900 dark:text-slate-100">
             TEMAN AI
           </span>
@@ -139,14 +155,16 @@ function PendingAI() {
             sedang menulis
           </span>
         </div>
-        <div className="mt-2 flex items-center gap-1.5" aria-hidden="true">
-          {[0, 1, 2].map((index) => (
-            <span
-              key={index}
-              className="teman-ai-dot h-1.5 w-1.5 rounded-full bg-blue-500 dark:bg-blue-400"
-              style={{ animationDelay: `${index * 140}ms` }}
-            />
-          ))}
+        <div className="rounded-2xl rounded-tl-md border border-blue-200/80 bg-blue-50 px-3.5 py-3 shadow-xs dark:border-blue-900/60 dark:bg-blue-950/30">
+          <div className="flex items-center gap-1.5" aria-hidden="true">
+            {[0, 1, 2].map((index) => (
+              <span
+                key={index}
+                className="teman-ai-dot h-1.5 w-1.5 rounded-full bg-blue-500 dark:bg-blue-400"
+                style={{ animationDelay: `${index * 140}ms` }}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </div>
