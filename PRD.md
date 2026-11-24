@@ -247,7 +247,7 @@ Task dapat dikelola oleh Owner dan anggota kompetisi terkait.
 
 Jangan membangun sistem chat terpisah.
 
-> **Revisi Global Chat:** Atas permintaan eksplisit pengguna, TEMAN menambahkan satu kanal **Global Chat** publik tim (`/chat`) sebagai perluasan kolaborasi. Kanal ini bukan chat per-kompetisi dan tidak menggantikan komentar task. Pesan tersimpan di Supabase, mention anggota tetap menghasilkan notifikasi, dan `@ai` memakai Edge Function Gemini server-side. Pertanyaan analitik diteruskan ke query baca-terbatas, bukan SQL bebas buatan model. Lihat `DESIGN.md` §7.9 dan `supabase/README.md`.
+> **Revisi Global Chat:** Atas permintaan eksplisit pengguna, TEMAN menambahkan satu kanal **Global Chat** publik tim (`/chat`) sebagai perluasan kolaborasi. Kanal ini bukan chat per-kompetisi dan tidak menggantikan komentar task. Pesan tersimpan di Supabase, mention anggota tetap menghasilkan notifikasi, dan `@ai` memakai Edge Function Gemini server-side. Pertanyaan analitik diteruskan ke query baca-terbatas, bukan SQL bebas buatan model. Fitur **reply**: anggota dapat membalas pesan lain di ruang yang sama, kutipan muncul dari `reply_to_id`, dan pesan baru tetap dikirim ke ruang global. Lihat `DESIGN.md` §7.9 dan `supabase/README.md`.
 
 ## E. Calendar
 

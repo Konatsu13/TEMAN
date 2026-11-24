@@ -247,12 +247,14 @@ Menggunakan keluarga font yang telah teruji keterbacaannya dan sudah terpasang d
   - **Channel Header:** Nama kanal, badge `Publik tim`, jumlah anggota online (jika presence tersedia), penanda `AI mention`, aksi muat ulang, dan tombol info pada layar kecil.
   - **Message Surface:** Bubble chat yang dikelompokkan per hari WIB. Pesan sendiri rata kanan dengan bubble biru kobalt tanpa avatar; pesan anggota lain rata kiri dengan avatar dan bubble surface ber-border. Sudut dekat penulis dibuat lebih tajam (`rounded-tr-md` / `rounded-tl-md`) sebagai penanda arah. Pesan berurutan dari penulis yang sama dalam 5 menit ditampilkan kompak (header nama/waktu disembunyikan, jarak antar-bubble dirapatkan). Lebar bubble dibatasi ±72% pada desktop dan ±85% pada mobile agar baris tetap terbaca. Mention `@username` dan `@ai` diberi penekanan visual (chip putih transparan di dalam bubble sendiri); tautan eksternal aman (`noopener noreferrer`).
   - **AI Reply:** Bubble biru lembut di sisi kiri dengan avatar sparkle, label `TEMAN AI`, status menulis, dan aksi coba lagi bila gagal. AI hanya dipicu oleh penulis pesan yang menyebut `@ai` atau `@teman`.
-  - **Composer:** Textarea auto-grow, `Enter` mengirim, `Shift+Enter` baris baru, autocomplete mention dengan navigasi keyboard, tombol `Mention`, dan tombol `Tanya AI`.
+  - **Reply (human):** Pesan bisa membalas pesan lain di ruang yang sama. Tombol aksi `Balas pesan` menandai pesan target; bubble menjunjung quote dari `reply_to_id` dengan nama penulis, teks singkat, tombol `Lihat pesan` untuk scroll ke posisi pesan asli, dan indikasi highlight saat diklik. Composer menampilkan banner ringkas `Membalas <penulis>` sebelum kirim.
+  - **Composer:** Textarea auto-grow, `Enter` mengirim, `Shift+Enter` baris baru, autocomplete mention dengan navigasi keyboard, tombol `Mention`, tombol `Tanya AI`, dan banner balasan bila dipilih.
   - **Info Aside (desktop `xl`):** Ringkasan kanal, statistik pesan/anggota/online, penjelasan AI, direktori anggota, dan panduan singkat. Pada layar kecil, konten yang sama dibuka dalam modal.
 - **State & Batasan:**
-  - Pesan dimuat maksimal 150 pesan terbaru; Realtime menangani INSERT/UPDATE/DELETE dengan polling fallback 30 detik saat tab terlihat.
+  - Pesan dimuat maksimal 150 pesan terbaru; Realtime menangani INSERT/UPDATE/DELETE dengan polling fallback 30 detik saat tab terlihat. Pesan yang dibalas tetapi di luar jendela 150 baris tetap dimuat sekali lewat helper `fetchChatMessageById` agar kutipan tetap tampil.
   - Pesan sendiri dapat diedit (maksimal 2000 karakter, label `diedit`); penulis dan Owner dapat menghapus dengan konfirmasi.
   - Pesan AI tidak dapat diedit; menghapus pesan induk ikut menghapus balasan AI melalui cascade.
+  - Balasan manusia ikut terhapus bersama pesan induk melalui cascade; bila pesan induk sudah di luar jendela yang dimuat, kutipan beralih ke status `Pesan yang dibalas tidak lagi tersedia.`
   - AI memakai Edge Function `chat-ai` dan Gemini server-side; pertanyaan analitik diteruskan ke query baca-terbatas `ai-query`, bukan mengeksekusi SQL yang dihasilkan model. Kunci API tidak pernah masuk bundle browser.
   - Jika tabel, policy, atau Edge Function belum disiapkan, UI menampilkan instruksi yang jelas tanpa mengklaim fitur sudah aktif.
 

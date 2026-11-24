@@ -16,15 +16,19 @@ import { ChatMessageItem } from './ChatMessageItem';
 
 interface ChatMessageListProps {
   messages: ChatMessage[];
+  replyTargets: Record<string, ChatMessage | null>;
   loading: boolean;
   error: string | null;
   currentUserId?: string;
   role: AppRole | null;
   aiPendingMessageId: string | null;
   aiError: ChatAIError | null;
+  highlightedMessageId: string | null;
   onRetryLoad: () => void;
   onEdit: (id: string, content: string) => Promise<void>;
   onRequestDelete: (message: ChatMessage) => void;
+  onReply: (message: ChatMessage) => void;
+  onJumpToMessage: (messageId: string) => void;
   onRetryAI: (messageId: string) => void;
   onDismissAIError: () => void;
   onSuggestion: (text: string) => void;
@@ -173,15 +177,19 @@ function PendingAI() {
 
 export function ChatMessageList({
   messages,
+  replyTargets,
   loading,
   error,
   currentUserId,
   role,
   aiPendingMessageId,
   aiError,
+  highlightedMessageId,
   onRetryLoad,
   onEdit,
   onRequestDelete,
+  onReply,
+  onJumpToMessage,
   onRetryAI,
   onDismissAIError,
   onSuggestion,
@@ -232,6 +240,7 @@ export function ChatMessageList({
         message: ChatMessage;
         compact: boolean;
         replyTo: ChatMessage | null;
+        replyMissing: boolean;
       }
   > = [];
 
@@ -260,14 +269,18 @@ export function ChatMessageList({
       previousMessage.author_id === message.author_id &&
       withinFiveMinutes;
 
+    const targetId = message.reply_to_id;
+    const replyTo = targetId
+      ? messagesById.get(targetId) ?? replyTargets[targetId] ?? null
+      : null;
+
     rows.push({
       type: 'message',
       key: message.id,
       message,
       compact,
-      replyTo: message.reply_to_id
-        ? messagesById.get(message.reply_to_id) ?? null
-        : null,
+      replyTo,
+      replyMissing: Boolean(targetId) && !replyTo,
     });
 
     previousDay = day;
@@ -310,6 +323,8 @@ export function ChatMessageList({
             key={row.key}
             message={row.message}
             replyTo={row.replyTo}
+            replyMissing={row.replyMissing}
+            highlighted={highlightedMessageId === row.message.id}
             isOwn={isOwn}
             canEdit={isOwn && !row.message.is_ai}
             canDelete={
@@ -318,6 +333,12 @@ export function ChatMessageList({
             compact={row.compact}
             onEdit={onEdit}
             onRequestDelete={onRequestDelete}
+            onReply={onReply}
+            onJumpToMessage={
+              row.replyTo && messagesById.has(row.replyTo.id)
+                ? onJumpToMessage
+                : undefined
+            }
           />
         );
       })}

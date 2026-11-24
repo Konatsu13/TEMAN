@@ -4,6 +4,7 @@ import type { AppRole } from '../types/database.types';
 import {
   deleteChatMessage as deleteChatMessageService,
   editChatMessage as editChatMessageService,
+  fetchChatMessageById,
   fetchChatMessages,
   fetchChatParticipants,
   notifyChatMentions,
@@ -56,6 +57,9 @@ export function useGlobalChat() {
   const { user, profile, role } = useAuth();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [participants, setParticipants] = useState<ChatParticipant[]>([]);
+  const [replyTargets, setReplyTargets] = useState<
+    Record<string, ChatMessage | null>
+  >({});
   const [onlineUsers, setOnlineUsers] = useState<OnlineChatUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
@@ -69,6 +73,7 @@ export function useGlobalChat() {
   const mountedRef = useRef(true);
   const participantsRef = useRef(new Map<string, ChatParticipant>());
   const pendingAiRef = useRef<string | null>(null);
+  const requestedReplyIdsRef = useRef(new Set<string>());
 
   useEffect(() => {
     mountedRef.current = true;
@@ -153,10 +158,86 @@ export function useGlobalChat() {
     });
   }, [participantsById, enrichMessage]);
 
+  /**
+   * Quoted replies may point at a message outside the 150 loaded rows. Load
+   * those parents once so the quote still shows the original text.
+   */
+  const ensureReplyTargets = useCallback(async (list: ChatMessage[]) => {
+    const loadedIds = new Set(list.map((message) => message.id));
+    const referencedIds = new Set(
+      list
+        .map((message) => message.reply_to_id)
+        .filter((id): id is string => Boolean(id))
+    );
+
+    const missingIds = [...referencedIds].filter(
+      (id) =>
+        !loadedIds.has(id) && !requestedReplyIdsRef.current.has(id)
+    );
+
+    if (missingIds.length === 0) return;
+    for (const id of missingIds) requestedReplyIdsRef.current.add(id);
+
+    const results = await Promise.all(
+      missingIds.map(async (id) => {
+        try {
+          return { id, message: await fetchChatMessageById(id) };
+        } catch {
+          // Allow a later refresh to try again.
+          requestedReplyIdsRef.current.delete(id);
+          return null;
+        }
+      })
+    );
+
+    if (!mountedRef.current) return;
+
+    const resolved = results.filter(
+      (result): result is { id: string; message: ChatMessage | null } =>
+        result !== null
+    );
+    if (resolved.length === 0) return;
+
+    setReplyTargets((current) => {
+      const next = { ...current };
+      for (const result of resolved) {
+        next[result.id] = result.message ? enrichMessage(result.message) : null;
+      }
+      return next;
+    });
+  }, [enrichMessage]);
+
+  useEffect(() => {
+    const referencedIds = new Set(
+      messages
+        .map((message) => message.reply_to_id)
+        .filter((id): id is string => Boolean(id))
+    );
+
+    setReplyTargets((current) => {
+      const keys = Object.keys(current);
+      if (!keys.some((key) => !referencedIds.has(key))) return current;
+
+      const next: Record<string, ChatMessage | null> = {};
+      for (const key of keys) {
+        if (referencedIds.has(key)) {
+          next[key] = current[key];
+        } else {
+          requestedReplyIdsRef.current.delete(key);
+        }
+      }
+      return next;
+    });
+
+    void ensureReplyTargets(messages);
+  }, [messages, ensureReplyTargets]);
+
   useEffect(() => {
     if (!user) {
       setMessages([]);
       setParticipants([]);
+      setReplyTargets({});
+      requestedReplyIdsRef.current.clear();
       setOnlineUsers([]);
       setLoading(false);
       return;
@@ -313,7 +394,7 @@ export function useGlobalChat() {
   ]);
 
   const sendMessage = useCallback(
-    async (content: string) => {
+    async (content: string, replyToId?: string | null) => {
       if (!user) throw new Error('Sesi login tidak valid.');
 
       const trimmed = content.trim();
@@ -323,7 +404,11 @@ export function useGlobalChat() {
       setSendError(null);
 
       try {
-        const message = await sendChatMessageService(user.id, trimmed);
+        const message = await sendChatMessageService(
+          user.id,
+          trimmed,
+          replyToId ?? null
+        );
         if (!mountedRef.current) return;
 
         const enriched =
@@ -405,6 +490,7 @@ export function useGlobalChat() {
   return {
     messages,
     participants,
+    replyTargets,
     onlineUsers,
     loading,
     sending,

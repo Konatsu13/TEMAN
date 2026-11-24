@@ -4,6 +4,7 @@ import {
   Copy,
   CornerDownRight,
   Pencil,
+  Reply,
   Sparkles,
   Trash2,
   X,
@@ -20,12 +21,16 @@ import { Badge } from '../ui/Badge';
 interface ChatMessageItemProps {
   message: ChatMessage;
   replyTo?: ChatMessage | null;
+  replyMissing?: boolean;
+  highlighted?: boolean;
   isOwn: boolean;
   canEdit: boolean;
   canDelete: boolean;
   compact?: boolean;
   onEdit: (id: string, content: string) => Promise<void>;
   onRequestDelete: (message: ChatMessage) => void;
+  onReply?: (message: ChatMessage) => void;
+  onJumpToMessage?: (messageId: string) => void;
 }
 
 type BubbleTone = 'own' | 'other' | 'ai';
@@ -88,14 +93,23 @@ function ActionButton({
 
 function ReplyQuote({
   replyTo,
+  missing = false,
   tone = 'other',
+  onJump,
 }: {
-  replyTo: ChatMessage;
+  replyTo?: ChatMessage | null;
+  missing?: boolean;
   tone?: BubbleTone;
+  onJump?: () => void;
 }) {
-  const authorName = replyTo.is_ai
-    ? 'TEMAN AI'
-    : replyTo.author?.full_name ?? 'Anggota';
+  const authorName = missing
+    ? 'Pesan asli'
+    : replyTo?.is_ai
+      ? 'TEMAN AI'
+      : replyTo?.author?.full_name ?? 'Anggota';
+  const preview = missing
+    ? 'Pesan yang dibalas tidak lagi tersedia.'
+    : replyTo?.content ?? '';
 
   const borderClass =
     tone === 'own'
@@ -109,15 +123,35 @@ function ReplyQuote({
       ? 'text-white'
       : 'text-slate-700 dark:text-slate-200';
 
+  const content = (
+    <>
+      <CornerDownRight className="mt-0.5 h-3 w-3 shrink-0" aria-hidden="true" />
+      <span className="line-clamp-2">
+        <strong className={`font-semibold ${nameClass}`}>{authorName}</strong>:{' '}
+        <span className={missing ? 'italic' : undefined}>{preview}</span>
+      </span>
+    </>
+  );
+
+  if (!missing && onJump) {
+    return (
+      <button
+        type="button"
+        onClick={onJump}
+        aria-label={`Lihat pesan ${authorName} yang dibalas`}
+        title="Lihat pesan yang dibalas"
+        className={`mb-1.5 flex w-full items-start gap-1.5 rounded border-l-2 pl-2 text-left text-[11px] leading-5 transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:ring-blue-600/30 focus-visible:outline-none ${borderClass}`}
+      >
+        {content}
+      </button>
+    );
+  }
+
   return (
     <div
       className={`mb-1.5 flex items-start gap-1.5 border-l-2 pl-2 text-[11px] leading-5 ${borderClass}`}
     >
-      <CornerDownRight className="mt-0.5 h-3 w-3 shrink-0" aria-hidden="true" />
-      <span className="line-clamp-2">
-        <strong className={`font-semibold ${nameClass}`}>{authorName}</strong>:{' '}
-        {replyTo.content}
-      </span>
+      {content}
     </div>
   );
 }
@@ -189,12 +223,16 @@ function MessageContent({
 export function ChatMessageItem({
   message,
   replyTo,
+  replyMissing = false,
+  highlighted = false,
   isOwn,
   canEdit,
   canDelete,
   compact = false,
   onEdit,
   onRequestDelete,
+  onReply,
+  onJumpToMessage,
 }: ChatMessageItemProps) {
   const [editing, setEditing] = useState(false);
   const [editValue, setEditValue] = useState(message.content);
@@ -249,6 +287,12 @@ export function ChatMessageItem({
 
   const actions = (
     <div className="flex shrink-0 items-center gap-0.5 opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100">
+      {onReply && !editing && (
+        <ActionButton label="Balas pesan" onClick={() => onReply(message)}>
+          <Reply className="h-3.5 w-3.5" />
+        </ActionButton>
+      )}
+
       <ActionButton label="Salin pesan" onClick={() => void copyMessage()}>
         {copied ? (
           <Check className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
@@ -332,11 +376,16 @@ export function ChatMessageItem({
     </div>
   );
 
+  const bubbleHighlight = highlighted
+    ? 'ring-2 ring-amber-300/90 dark:ring-amber-500/60'
+    : '';
+
   if (message.is_ai) {
     return (
       <article
+        id={`chat-message-${message.id}`}
         aria-label="Jawaban TEMAN AI"
-        className="group mt-3 flex items-start gap-2.5 px-3 sm:px-4"
+        className="group mt-3 flex scroll-mt-4 items-start gap-2.5 px-3 sm:px-4"
       >
         <Avatar name={null} isAi />
 
@@ -359,8 +408,21 @@ export function ChatMessageItem({
             </time>
           </div>
 
-          <div className="rounded-2xl rounded-tl-md border border-blue-200/80 bg-blue-50 px-3.5 py-2.5 shadow-xs dark:border-blue-900/60 dark:bg-blue-950/30">
-            {replyTo && <ReplyQuote replyTo={replyTo} tone="ai" />}
+          <div
+            className={`rounded-2xl rounded-tl-md border border-blue-200/80 bg-blue-50 px-3.5 py-2.5 shadow-xs dark:border-blue-900/60 dark:bg-blue-950/30 ${bubbleHighlight}`}
+          >
+            {(replyTo || replyMissing) && (
+              <ReplyQuote
+                replyTo={replyTo}
+                missing={replyMissing}
+                tone="ai"
+                onJump={
+                  replyTo && onJumpToMessage
+                    ? () => onJumpToMessage(replyTo.id)
+                    : undefined
+                }
+              />
+            )}
             <MessageContent content={message.content} tone="ai" />
           </div>
         </div>
@@ -375,7 +437,8 @@ export function ChatMessageItem({
 
   return (
     <article
-      className={`group flex items-start gap-2 px-3 sm:px-4 ${
+      id={`chat-message-${message.id}`}
+      className={`group flex scroll-mt-4 items-start gap-2 px-3 sm:px-4 ${
         compact ? 'mt-0.5' : 'mt-3'
       } ${isOwn ? 'justify-end' : ''}`}
     >
@@ -428,9 +491,20 @@ export function ChatMessageItem({
               isOwn
                 ? 'rounded-2xl rounded-tr-md bg-blue-600 text-white ring-1 ring-blue-700/10 dark:ring-blue-400/20'
                 : 'rounded-2xl rounded-tl-md border border-slate-200/90 bg-white text-slate-700 dark:border-slate-700/80 dark:bg-slate-800 dark:text-slate-200'
-            }`}
+            } ${bubbleHighlight}`}
           >
-            {replyTo && <ReplyQuote replyTo={replyTo} tone={tone} />}
+            {(replyTo || replyMissing) && (
+              <ReplyQuote
+                replyTo={replyTo}
+                missing={replyMissing}
+                tone={tone}
+                onJump={
+                  replyTo && onJumpToMessage
+                    ? () => onJumpToMessage(replyTo.id)
+                    : undefined
+                }
+              />
+            )}
             <MessageContent content={message.content} tone={tone} />
             {message.edited_at && (
               <span

@@ -45,8 +45,8 @@ UI are in `src/components/shared/AIQueryAssistant.tsx`.
 ## Global Chat
 
 Global Chat is one persistent public room for every active workspace member (`/chat`).
-It supports `@username` mentions, in-app mention notifications, WIB timestamps, editing
-your own messages, and Owner moderation. Messages are stored in Supabase and synchronized
+It supports `@username` mentions, quoted replies, in-app mention notifications, WIB timestamps,
+editing your own messages, and Owner moderation. Messages are stored in Supabase and synchronized
 with Realtime; the page also polls every 30 seconds while visible as a fallback.
 
 ### Database setup (required once)
@@ -54,8 +54,9 @@ with Realtime; the page also polls every 30 seconds while visible as a fallback.
 Review and run `supabase/migrations/002_global_chat.sql` in the Supabase SQL Editor. It
 creates `public.chat_messages`, the `is_valid_chat_ai_reply` guard used by RLS, the
 `notify_chat_mentions` helper that creates in-app mention notifications from stored messages,
-indexes, RLS policies, and adds the table to the `supabase_realtime` publication. This repository
-does not apply migrations automatically.
+indexes, RLS policies, and adds the table to the `supabase_realtime` publication. Then run
+`supabase/migrations/004_global_chat_replies.sql` to add the reply lookup index and document
+human replies on `reply_to_id`. This repository does not apply migrations automatically.
 
 ### AI mentions with Gemini
 

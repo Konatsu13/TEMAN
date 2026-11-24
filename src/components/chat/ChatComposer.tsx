@@ -6,8 +6,8 @@ import {
   type FormEvent,
   type KeyboardEvent as ReactKeyboardEvent,
 } from 'react';
-import { AlertCircle, AtSign, Send, Sparkles } from 'lucide-react';
-import type { ChatParticipant } from '../../services/chatService';
+import { AlertCircle, AtSign, Reply, Send, Sparkles, X } from 'lucide-react';
+import type { ChatMessage, ChatParticipant } from '../../services/chatService';
 import { getInitials } from '../../utils/formatters';
 import {
   applyMention,
@@ -23,6 +23,8 @@ interface ChatComposerProps {
   onSend: (content: string) => Promise<void>;
   participants: ChatParticipant[];
   currentUserId: string;
+  replyTo?: ChatMessage | null;
+  onCancelReply?: () => void;
   sending: boolean;
   error: string | null;
   onClearError: () => void;
@@ -44,6 +46,8 @@ export function ChatComposer({
   onSend,
   participants,
   currentUserId,
+  replyTo = null,
+  onCancelReply,
   sending,
   error,
   onClearError,
@@ -227,6 +231,9 @@ export function ChatComposer({
   };
 
   const aiMentionActive = hasAiMention(value);
+  const replyAuthorName = replyTo?.is_ai
+    ? 'TEMAN AI'
+    : replyTo?.author?.full_name ?? 'Anggota';
 
   return (
     <div
@@ -309,6 +316,35 @@ export function ChatComposer({
         </div>
       )}
 
+      {replyTo && (
+        <div className="mb-2 flex items-start gap-2 rounded-lg border border-blue-200 bg-blue-50/80 px-2.5 py-2 dark:border-blue-900/60 dark:bg-blue-950/30">
+          <Reply
+            className="mt-0.5 h-3.5 w-3.5 shrink-0 text-blue-600 dark:text-blue-400"
+            aria-hidden="true"
+          />
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-semibold tracking-[0.08em] text-blue-700 uppercase dark:text-blue-300">
+              Membalas {replyAuthorName}
+            </p>
+            <p className="mt-0.5 line-clamp-2 text-[11.5px] leading-5 whitespace-pre-wrap text-slate-600 dark:text-slate-300">
+              {replyTo.content}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              onClearError();
+              onCancelReply?.();
+            }}
+            aria-label="Batalkan balasan"
+            title="Batalkan balasan"
+            className="grid h-6 w-6 shrink-0 place-items-center rounded-md text-blue-600 transition-colors hover:bg-blue-100 focus-visible:ring-2 focus-visible:ring-blue-600/30 focus-visible:outline-none dark:text-blue-400 dark:hover:bg-blue-950/60"
+          >
+            <X className="h-3.5 w-3.5" aria-hidden="true" />
+          </button>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit}>
         <div className="rounded-xl border border-slate-300 bg-white shadow-xs transition-colors focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/15 dark:border-slate-700 dark:bg-slate-950">
           <label htmlFor="global-chat-message" className="sr-only">
@@ -345,7 +381,11 @@ export function ChatComposer({
                 : undefined
             }
             aria-describedby="global-chat-composer-hint"
-            placeholder="Tulis pesan untuk tim… gunakan @ untuk mention atau @ai untuk bertanya ke AI"
+            placeholder={
+              replyTo
+                ? `Balas ${replyAuthorName}… gunakan @ untuk mention atau @ai untuk bertanya ke AI`
+                : 'Tulis pesan untuk tim… gunakan @ untuk mention atau @ai untuk bertanya ke AI'
+            }
             className="block max-h-40 min-h-10 w-full resize-none bg-transparent px-3 py-2.5 text-[13px] leading-6 text-slate-900 placeholder:text-slate-400 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60 dark:text-slate-100 dark:placeholder:text-slate-500"
           />
 

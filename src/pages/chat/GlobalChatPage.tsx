@@ -23,6 +23,7 @@ export function GlobalChatPage() {
   const {
     messages,
     participants,
+    replyTargets,
     onlineUsers,
     loading,
     sending,
@@ -40,6 +41,10 @@ export function GlobalChatPage() {
   } = useGlobalChat();
 
   const [draft, setDraft] = useState('');
+  const [replyTarget, setReplyTarget] = useState<ChatMessage | null>(null);
+  const [highlightedMessageId, setHighlightedMessageId] = useState<
+    string | null
+  >(null);
   const [infoOpen, setInfoOpen] = useState(false);
   const [pendingDelete, setPendingDelete] = useState<ChatMessage | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -49,6 +54,15 @@ export function GlobalChatPage() {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const nearBottomRef = useRef(true);
   const lastMessageIdRef = useRef<string | null>(null);
+  const highlightTimerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (highlightTimerRef.current !== null) {
+        window.clearTimeout(highlightTimerRef.current);
+      }
+    };
+  }, []);
 
   const onlineCount = onlineUsers.length;
   const currentUserId = user?.id ?? '';
@@ -116,11 +130,37 @@ export function GlobalChatPage() {
 
   const handleSend = useCallback(
     async (content: string) => {
-      await sendMessage(content);
+      await sendMessage(content, replyTarget?.id ?? null);
+      setReplyTarget(null);
       setDraft('');
     },
-    [sendMessage]
+    [replyTarget, sendMessage]
   );
+
+  const handleReply = useCallback((message: ChatMessage) => {
+    setReplyTarget(message);
+    requestAnimationFrame(() => {
+      document.getElementById('global-chat-message')?.focus();
+    });
+  }, []);
+
+  const cancelReply = useCallback(() => setReplyTarget(null), []);
+
+  const handleJumpToMessage = useCallback((messageId: string) => {
+    const node = document.getElementById(`chat-message-${messageId}`);
+    if (!node) return;
+
+    node.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setHighlightedMessageId(messageId);
+
+    if (highlightTimerRef.current !== null) {
+      window.clearTimeout(highlightTimerRef.current);
+    }
+    highlightTimerRef.current = window.setTimeout(() => {
+      setHighlightedMessageId(null);
+      highlightTimerRef.current = null;
+    }, 1800);
+  }, []);
 
   const handleSuggestion = useCallback((text: string) => {
     setDraft(text);
@@ -147,6 +187,13 @@ export function GlobalChatPage() {
     setDeleteError(null);
     try {
       await deleteMessage(pendingDelete.id);
+      if (
+        replyTarget &&
+        (replyTarget.id === pendingDelete.id ||
+          replyTarget.reply_to_id === pendingDelete.id)
+      ) {
+        setReplyTarget(null);
+      }
       setPendingDelete(null);
     } catch (deleteFailure) {
       setDeleteError(
@@ -157,7 +204,7 @@ export function GlobalChatPage() {
     } finally {
       setDeleting(false);
     }
-  }, [deleteMessage, deleting, pendingDelete]);
+  }, [deleteMessage, deleting, pendingDelete, replyTarget]);
 
   const deleteAuthor = pendingDelete?.is_ai
     ? 'TEMAN AI'
@@ -247,15 +294,19 @@ export function GlobalChatPage() {
               <div className="mx-auto flex min-h-full w-full max-w-3xl flex-col pb-2">
                 <ChatMessageList
                   messages={messages}
+                  replyTargets={replyTargets}
                   loading={loading}
                   error={error}
                   currentUserId={currentUserId}
                   role={role}
                   aiPendingMessageId={aiPendingMessageId}
                   aiError={aiError}
+                  highlightedMessageId={highlightedMessageId}
                   onRetryLoad={() => void refresh()}
                   onEdit={editMessage}
                   onRequestDelete={requestDelete}
+                  onReply={handleReply}
+                  onJumpToMessage={handleJumpToMessage}
                   onRetryAI={retryAI}
                   onDismissAIError={clearAIError}
                   onSuggestion={handleSuggestion}
@@ -283,6 +334,8 @@ export function GlobalChatPage() {
               onSend={handleSend}
               participants={participants}
               currentUserId={currentUserId}
+              replyTo={replyTarget}
+              onCancelReply={cancelReply}
               sending={sending}
               error={sendError}
               onClearError={clearSendError}

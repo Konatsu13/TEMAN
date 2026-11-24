@@ -83,7 +83,8 @@ export async function fetchChatMessageById(id: string): Promise<ChatMessage | nu
 
 export async function sendChatMessage(
   authorId: string,
-  content: string
+  content: string,
+  replyToId?: string | null
 ): Promise<ChatMessage> {
   const client = requireSupabaseClient();
   const { data, error } = await client
@@ -92,6 +93,7 @@ export async function sendChatMessage(
       author_id: authorId,
       content: assertContent(content),
       is_ai: false,
+      reply_to_id: replyToId ?? null,
     })
     .select(CHAT_MESSAGE_SELECT)
     .single();

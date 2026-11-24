@@ -47,6 +47,9 @@ Global Chat adalah satu kanal publik untuk seluruh anggota aktif. Jalankan migra
   - Membuat helper `notify_chat_mentions` untuk notifikasi in-app dari pesan yang sesungguhnya ditulis pengguna.
   - Menambahkan tabel ke publication `supabase_realtime` untuk sinkronisasi INSERT/UPDATE/DELETE.
 
+Pelanjutnya, jalankan `supabase/migrations/004_global_chat_replies.sql` untuk index pencarian
+balasan (`reply_to_id`) dan memperjelas dokumentasi kolom `reply_to_id` untuk balasan manusia.
+
 Migration ini **tidak dijalankan otomatis** oleh repository. Tanpa migration, halaman `/chat` akan menampilkan instruksi setup.
 
 ### Edge Function `chat-ai`
